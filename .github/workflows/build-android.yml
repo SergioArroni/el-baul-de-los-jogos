@@ -70,6 +70,32 @@ jobs:
           path: el-baul-de-los-jogos.apk
           if-no-files-found: error
           retention-days: 30
+      # Google Play wants an Android App Bundle (AAB) signed with the same key (jarsigner,
+      # since apksigner only signs APKs). It doesn't block the APK while it is new.
+      - name: Build signed release AAB (Google Play)
+        continue-on-error: true
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: el-baul
+        run: |
+          trap 'rm -f "$RUNNER_TEMP/release.jks"' EXIT
+          echo "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/release.jks"
+          npx cap build android --androidreleasetype AAB --signing-type jarsigner \
+            --keystorepath "$RUNNER_TEMP/release.jks" --keystorepass "$KEYSTORE_PASSWORD" \
+            --keystorealias "$KEY_ALIAS" --keystorealiaspass "$KEYSTORE_PASSWORD"
+          rm -f "$RUNNER_TEMP/release.jks"
+          find android/app/build/outputs/bundle -name '*.aab' -print
+          cp "$(find android/app/build/outputs/bundle/release -name '*signed*.aab' | head -1 || true)" el-baul-de-los-jogos.aab 2>/dev/null \
+            || cp "$(find android/app/build/outputs/bundle/release -name '*.aab' | head -1)" el-baul-de-los-jogos.aab
+          jarsigner -verify el-baul-de-los-jogos.aab | tail -1
+      - name: Upload AAB
+        if: hashFiles('el-baul-de-los-jogos.aab') != ''
+        uses: actions/upload-artifact@v7
+        with:
+          name: el-baul-de-los-jogos-${{ github.ref_name }}-aab
+          path: el-baul-de-los-jogos.aab
+          retention-days: 30
 
   # Installs the APK on an Android emulator and takes screenshots online and offline,
   # to check the bundled app really starts (and doesn't need the network to show up).

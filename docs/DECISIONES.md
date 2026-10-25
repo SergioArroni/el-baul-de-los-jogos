@@ -157,3 +157,11 @@ Cuando una decisión cambie, no se borra: se marca como **Sustituida** y se aña
 - **Decisión:** Supabase Auth hace de servidor OAuth 2.1. El MCP responde 401 con `WWW-Authenticate` apuntando a `/.well-known/oauth-protected-resource/api/mcp` (RFC 9728), que nombra a Supabase como emisor; la página `/oauth/consent` muestra a quién das permiso y llama a `approveAuthorization` o `denyAuthorization`. En producción cada token se comprueba con Supabase (con caché de 5 minutos) y uno caducado recibe 401 para que el cliente lo renueve. El login acepta `?next=` (solo rutas de esta web) para volver al permiso. La dirección del servidor de la APK sale de `VITE_WEB_ORIGIN`, que el workflow de Android fija según la rama.
 - **Alternativas:** emitir tokens propios (más código delicado de seguridad); tokens de API copiados a mano (incómodo y fácil de filtrar); APK siempre contra producción (se rompe cuando la APK es más nueva).
 - **Consecuencias:** la conexión real solo se puede probar en producción, porque la página de permiso vive en la Site URL de Supabase. Guía para usuarios en `docs/CONECTAR-IA.md`.
+
+## 20. Preparar Google Play: AAB y «Entrar con Google»
+**Estado:** Aceptada, en `dev`
+
+- **Contexto:** Google Play pide un Android App Bundle (AAB) y entrar con Google ahorra contraseñas.
+- **Decisión:** el workflow de Android genera además un AAB firmado con la misma clave (jarsigner); de momento no bloquea la APK si falla. El login muestra «Entrar con Google» solo si Supabase tiene Google activado (lo consulta en `/auth/v1/settings`) y nunca dentro de la APK. `sql/google-login.sql` da un apodo automático a las cuentas que llegan sin él. Pasos para activarlo en `docs/GOOGLE-LOGIN.md`.
+- **Alternativas:** plugin nativo de Google para la APK (más trabajo y otra configuración en Google Cloud); pedir el apodo en una pantalla aparte tras el primer acceso con Google (más fricción).
+- **Consecuencias:** en la APK se sigue entrando con correo o apodo. Cuando el AAB salga bien en GitHub, se quita el `continue-on-error`.

@@ -39,3 +39,13 @@ test('the consent page for Claude/ChatGPT loads and explains what is missing', a
   await expect(page.getByRole('status')).not.toHaveText('Comprobando tu sesión…');
   expect(errors).toEqual([]);
 });
+
+test('"Entrar con Google" only shows when Supabase has Google enabled', async ({ page }) => {
+  await page.goto('/login.html');
+  await expect(page.getByRole('heading', { name: 'Qué bueno verte.' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Entrar con Google' })).toBeHidden();
+
+  await page.route('**/auth/v1/settings', route => route.fulfill({ json: { external: { google: true, email: true } } }));
+  await page.reload();
+  await expect(page.getByRole('button', { name: 'Entrar con Google' })).toBeVisible();
+});
