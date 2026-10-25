@@ -4,11 +4,12 @@ import { ADMIN_EMAIL, localMode, supabase } from '../data/client';
 import { CloudSync } from '../data/collection';
 import { loadLocal, localSetting, saveLocal, type Collection } from '../data/local';
 import { loadPlays } from '../data/plays';
-import { loadProfile } from '../data/profile';
+import { loadProfile, type Privacy } from '../data/profile';
 import { loadFriendRequests, loadPeople, lookupAccounts, syncFriendLinks } from '../data/social';
 import { loadWishlist } from '../data/wishlist';
 import { groupKey } from '../domain/groups';
 import { playStats } from '../domain/stats';
+import { nameKey } from '../domain/text';
 import type {
   Friend, FriendRequest, Game, Group, Person, Place, Play, WishlistGame, WishlistVote,
 } from '../domain/types';
@@ -29,6 +30,8 @@ class AppStore {
   tab = $state<Tab>('catalog');
   /** Group opened in Partidas: null shows all groups, '' the plays without a group. */
   playView = $state<string | null>(null);
+  /** Account whose profile is open in Comunidad. */
+  personView = $state<string | null>(null);
 
   games = $state<Game[]>([]);
   groups = $state<Group[]>([]);
@@ -44,6 +47,8 @@ class AppStore {
 
   nickname = $state('');
   avatarUrl = $state('');
+  /** Undefined until sql/profiles-privacy.sql has been run. */
+  privacy = $state<Privacy | undefined>();
 
   stats = $derived(playStats(this.plays));
   isAdmin = $derived(
@@ -153,6 +158,7 @@ class AppStore {
     const profile = await loadProfile(this.user.id);
     this.nickname = profile.nickname;
     this.avatarUrl = profile.avatarUrl;
+    this.privacy = profile.privacy;
   }
 
   /** Wishlist, notices and plays, plus the nicknames and photos of everyone they mention. */
@@ -257,6 +263,13 @@ class AppStore {
     if (friend.userId) void this.loadPeople([friend.userId]);
   }
 
+  /** Adds an account to the friend list (or links the friend with that name), which lets them see "Solo amigos". */
+  addFriendAccount(userId: string, nickname: string): void {
+    if (this.friends.some(f => f.userId === userId)) return;
+    const unlinked = this.friends.find(f => !f.userId && nameKey(f.name) === nameKey(nickname));
+    this.upsertFriend(unlinked ? { id: unlinked.id, name: unlinked.name, userId, nickname } : { id: uid(), name: nickname, userId, nickname });
+  }
+
   deleteFriend(id: string): void {
     this.friends = this.friends.filter(f => f.id !== id);
     this.groups = this.groups.map(g => ({ ...g, friendIds: (g.friendIds ?? []).filter(x => x !== id) }));
@@ -271,6 +284,11 @@ class AppStore {
   replaceCollection(collection: Collection): void {
     this.useCollection(collection);
     this.save();
+  }
+
+  openPerson(userId: string): void {
+    this.personView = userId;
+    this.tab = 'groups';
   }
 
   openPlayGroup(key: string | null): void {

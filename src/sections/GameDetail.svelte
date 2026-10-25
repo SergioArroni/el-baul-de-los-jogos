@@ -10,12 +10,14 @@
   interface Props {
     game: Game | null;
     onclose: () => void;
-    onedit: (game: Game) => void;
-    ondelete: (game: Game) => void;
-    onplay: (game: Game) => void;
+    /** Someone else's game: only the details and how to play, no actions. */
+    readonly?: boolean;
+    onedit?: (game: Game) => void;
+    ondelete?: (game: Game) => void;
+    onplay?: (game: Game) => void;
   }
 
-  let { game, onclose, onedit, ondelete, onplay }: Props = $props();
+  let { game, onclose, readonly = false, onedit, ondelete, onplay }: Props = $props();
 
   const art = $derived(game ? gameArt(game) : null);
   const entry = $derived(game ? findInLibrary(game.name) : undefined);
@@ -65,7 +67,7 @@
       {:else if entry}
         <p class="notice">Aún no tenemos una explicación fiable de este juego: mejor mirar el reglamento de la caja.</p>
       {/if}
-      {#if canPlay}
+      {#if canPlay && !readonly}
         <div class="detail-stats">
           {#if stat}
             <div><strong>{stat.count}</strong><span>{stat.count === 1 ? 'partida' : 'partidas'}</span></div>
@@ -77,10 +79,12 @@
         </div>
       {/if}
     </div>
-    <div class="formactions">
-      <button type="button" class="btn ghost" onclick={() => ondelete(game)}>Eliminar</button>
-      <button type="button" class="btn secondary" onclick={() => onedit(game)}>Editar</button>
-      {#if canPlay}<button type="button" class="btn" onclick={() => onplay(game)}>Registrar partida</button>{/if}
-    </div>
+    {#if !readonly}
+      <div class="formactions">
+        <button type="button" class="btn ghost" onclick={() => ondelete?.(game)}>Eliminar</button>
+        <button type="button" class="btn secondary" onclick={() => onedit?.(game)}>Editar</button>
+        {#if canPlay}<button type="button" class="btn" onclick={() => onplay?.(game)}>Registrar partida</button>{/if}
+      </div>
+    {/if}
   {/if}
 </Modal>

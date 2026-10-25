@@ -102,6 +102,20 @@ export interface Person {
   avatarUrl: string;
 }
 
+/** Who can see a person's collection or statistics. "friends" = the people they added. */
+export type Visibility = 'public' | 'friends' | 'private';
+
+/** One game in someone's play history, summarised by the database (sql/profiles-privacy.sql). */
+export interface PersonGameStat {
+  game_name: string;
+  plays: number;
+  wins: number;
+  losses: number;
+  /** Average of the ratings this person gave; null if they never rated it. */
+  rating: number | null;
+  last_played: string;
+}
+
 export interface FriendRequest {
   owner_id: string;
 }

@@ -1,9 +1,17 @@
+import type { Visibility } from '../domain/types';
 import { requireClient } from './client';
 
 export interface Profile {
   nickname: string;
   avatarPath: string;
   avatarUrl: string;
+  /** Missing until sql/profiles-privacy.sql has been run. */
+  privacy?: Privacy;
+}
+
+export interface Privacy {
+  collection: Visibility;
+  stats: Visibility;
 }
 
 export async function loadProfile(userId: string): Promise<Profile> {
@@ -17,7 +25,14 @@ export async function loadProfile(userId: string): Promise<Profile> {
     if (signed.error) throw signed.error;
     avatarUrl = signed.data.signedUrl;
   }
-  return { nickname: data.nickname ?? '', avatarPath, avatarUrl };
+  const privacy = data.collection_visibility ? { collection: data.collection_visibility, stats: data.stats_visibility } : undefined;
+  return { nickname: data.nickname ?? '', avatarPath, avatarUrl, privacy };
+}
+
+export async function updatePrivacy(userId: string, privacy: Privacy): Promise<void> {
+  const { error } = await requireClient().from('profiles')
+    .update({ collection_visibility: privacy.collection, stats_visibility: privacy.stats }).eq('user_id', userId);
+  if (error) throw error;
 }
 
 export async function updateNickname(userId: string, nickname: string): Promise<void> {

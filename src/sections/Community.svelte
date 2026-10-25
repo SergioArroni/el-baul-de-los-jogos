@@ -1,10 +1,11 @@
 <script lang="ts">
   import Avatar from '../components/Avatar.svelte';
+  import { searchPeople, type PersonSummary } from '../data/people';
   import { dismissFriendRequest } from '../data/social';
   import { groupMembers } from '../domain/groups';
   import { nameKey } from '../domain/text';
   import type { Friend, Group } from '../domain/types';
-  import { app, uid } from '../stores/app.svelte';
+  import { app } from '../stores/app.svelte';
   import { askConfirm } from '../stores/confirm.svelte';
   import FriendForm from './FriendForm.svelte';
   import GroupForm from './GroupForm.svelte';
@@ -14,13 +15,38 @@
   let groupDialog = $state<{ open: boolean; group?: Group }>({ open: false });
   let sharing = $state<Group | null>(null);
 
+  let query = $state('');
+  let results = $state<PersonSummary[]>([]);
+  let searchStatus = $state('');
+  let searchTimer: ReturnType<typeof setTimeout> | undefined;
+
+  /** Waits for a short pause in typing, and ignores answers to older searches. */
+  function search() {
+    clearTimeout(searchTimer);
+    const text = query.trim();
+    if (text.length < 2) {
+      results = [];
+      searchStatus = '';
+      return;
+    }
+    searchTimer = setTimeout(async () => {
+      try {
+        const found = await searchPeople(text);
+        if (text !== query.trim()) return;
+        results = found;
+        searchStatus = found.length ? '' : 'No hay nadie con ese apodo.';
+        void app.loadPeople(found.map(person => person.userId));
+      } catch (error) {
+        searchStatus = (error as Error).message;
+      }
+    }, 250);
+  }
+
   const groupCount = (friend: Friend) => app.groups.filter(g => (g.friendIds ?? []).includes(friend.id)).length;
 
   function accept(ownerId: string) {
     const nickname = app.people.get(ownerId)?.nickname;
-    if (!nickname || app.friends.some(f => f.userId === ownerId)) return;
-    const unlinked = app.friends.find(f => !f.userId && nameKey(f.name) === nameKey(nickname));
-    app.upsertFriend(unlinked ? { id: unlinked.id, name: unlinked.name, userId: ownerId, nickname } : { id: uid(), name: nickname, userId: ownerId, nickname });
+    if (nickname) app.addFriendAccount(ownerId, nickname);
   }
 
   async function dismiss(ownerId: string) {
@@ -60,6 +86,31 @@
     {/each}
   </div>
 
+  <section class="community-section" aria-labelledby="peopleHeading">
+    <div class="community-head">
+      <div><h3 id="peopleHeading">Buscar personas</h3><p>Encuentra a otros jugadores por su apodo y mira su perfil.</p></div>
+    </div>
+    {#if app.user}
+      <label class="searchbox people-search"><span aria-hidden="true">⌕</span>
+        <input class="search" type="search" placeholder="Escribe un apodo…" aria-label="Buscar personas por apodo" bind:value={query} oninput={search} />
+      </label>
+      <p class="notice" role="status">{searchStatus}</p>
+      {#if results.length}
+        <div class="people-results">
+          {#each results as person (person.userId)}
+            <button class="person-result" type="button" onclick={() => app.openPerson(person.userId)}>
+              <Avatar userId={person.userId} name={person.nickname} />
+              <span>@{person.nickname}</span>
+              {#if person.userId === app.user.id}<small>Tú</small>{:else if app.friends.some(f => f.userId === person.userId)}<small>En tus amigos</small>{/if}
+            </button>
+          {/each}
+        </div>
+      {/if}
+    {:else}
+      <p class="notice">Inicia sesión para buscar personas y ver sus perfiles.</p>
+    {/if}
+  </section>
+
   <section class="community-section" aria-labelledby="friendsHeading">
     <div class="community-head">
       <div><h3 id="friendsHeading">Amigos</h3><p>Añade cada amigo una vez y úsalo en todos los grupos que quieras.</p></div>
@@ -76,6 +127,7 @@
             <div class="tags"><span class="tag">Invitación pendiente</span></div>
           {/if}
           <div class="actions">
+            {#if friend.userId && app.user}<button class="btn secondary" onclick={() => app.openPerson(friend.userId!)}>Ver perfil</button>{/if}
             <button class="btn secondary" onclick={() => (friendDialog = { open: true, friend })}>Editar</button>
             {#if !friend.userId && (friend.invite || friend.email)}
               <button class="btn ghost" onclick={() => (friendDialog = { open: true, friend, inviteOnly: true })}>Invitar</button>

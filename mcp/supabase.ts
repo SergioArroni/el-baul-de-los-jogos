@@ -40,7 +40,8 @@ export function supabaseData(token: string, env: Record<string, string | undefin
     async collection() {
       const me = await this.account();
       const [games, groups, friends] = await Promise.all([
-        db.from('games').select('data'),
+        // Only their own games: RLS also returns other people's visible collections.
+        db.from('games').select('data').eq('user_id', me.id),
         db.from('groups').select('user_id,data'),
         db.from('friends').select('data'),
       ]);

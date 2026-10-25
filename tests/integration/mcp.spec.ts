@@ -45,7 +45,9 @@ test.beforeAll(() => {
       ('11111111-1111-1111-1111-111111111111', '${users.a.id}', '${users.a.id}', 'grp1', 'Los Balcánicos', 'Catan', '2026-10-20');
     insert into public.play_players(play_id, name, user_id, winner, rating) values
       ('11111111-1111-1111-1111-111111111111', 'usuario_a', '${users.a.id}', true, 9),
-      ('11111111-1111-1111-1111-111111111111', 'Pepe', null, false, 7);`, { admin: true });
+      ('11111111-1111-1111-1111-111111111111', 'Pepe', null, false, 7);
+    -- B's collection is public: A may browse it in the app, but it is not A's collection.
+    update public.profiles set collection_visibility = 'public' where user_id = '${users.b.id}';`, { admin: true });
 });
 
 test('introduces itself and lists its tools', async ({ request }) => {

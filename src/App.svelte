@@ -6,6 +6,7 @@
   import Backup from './sections/Backup.svelte';
   import Catalog from './sections/Catalog.svelte';
   import Community from './sections/Community.svelte';
+  import PersonProfile from './sections/PersonProfile.svelte';
   import GameForm from './sections/GameForm.svelte';
   import Places from './sections/Places.svelte';
   import PlayForm from './sections/PlayForm.svelte';
@@ -31,6 +32,7 @@
   // Android back button: close dialogs first, then return to the catalog, then leave the app.
   handleBackButton(() => {
     if (app.tab === 'plays' && app.playView !== null) app.playView = null;
+    else if (app.tab === 'groups' && app.personView !== null) app.personView = null;
     else if (app.tab !== 'catalog') navigate('catalog');
     else return false;
     return true;
@@ -39,6 +41,7 @@
   function navigate(tab: Tab) {
     if (tab === 'backup' && !app.isAdmin) return;
     app.tab = tab;
+    app.personView = null;
     window.scrollTo({ top: 0, behavior: 'smooth' });
     if (tab === 'profile') app.loadProfile().catch(error => console.error(error));
   }
@@ -57,7 +60,7 @@
     {:else if app.tab === 'plays'}
       <Plays onplay={({ play, group }) => (playDialog = { open: true, play, group })} />
     {:else if app.tab === 'groups'}
-      <Community />
+      {#if app.personView}<PersonProfile userId={app.personView} />{:else}<Community />{/if}
     {:else if app.tab === 'newGames'}
       <Wishlist />
     {:else if app.tab === 'profile'}

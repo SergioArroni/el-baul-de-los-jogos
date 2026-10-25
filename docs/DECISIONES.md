@@ -109,3 +109,11 @@ Cuando una decisión cambie, no se borra: se marca como **Sustituida** y se aña
 - **Decisión:** el juego guarda una lista de lugares (`locations`) en vez de uno (`location`). Como cada juego se guarda como JSON en Supabase, no hace falta SQL: al cargar, `normalizeGamePlace` convierte el formato antiguo y la app vuelve a guardar la colección. El MCP usa la misma función.
 - **Alternativas:** un juego repetido por cada casa (dos fichas, con notas y estadísticas duplicadas); una tabla aparte de «copias» con su lugar (más correcta si algún día cada copia tiene su estado o su edición, pero mucho más trabajo ahora).
 - **Consecuencias:** filtros, recomendaciones y el recuento de lugares miran si el lugar está en la lista. Una versión antigua de la app (la de producción hasta publicar) no entiende la lista y mostraría esos juegos como «Lugar por asignar».
+
+## 14. Perfiles con privacidad, aplicada por la base de datos
+**Estado:** Aceptada, en `dev`
+
+- **Contexto:** se quería ver la colección y las estadísticas de los amigos, buscar a otras personas y que cada uno decida qué enseña.
+- **Decisión:** cada perfil tiene dos ajustes, uno para la colección y otro para las estadísticas, con tres valores: pública, solo amigos o privada. «Amigo» es alguien que **tú** has añadido con su cuenta (tabla `friend_links`): si yo te añado, tú ves lo que tengo en «Solo amigos». Por defecto todo es «Solo amigos». Las reglas están en Supabase (`sql/profiles-privacy.sql`): una política RLS de solo lectura sobre `games` y una función, `profile_game_stats`, que devuelve el resumen por juego de tus partidas, nunca las partidas en sí. La app solo explica por qué algo está oculto (`src/domain/profiles.ts` repite la regla). El buscador encuentra a todos por apodo; los apodos y las fotos ya los veía cualquiera con sesión.
+- **Alternativas:** filtrar en la app (cualquiera podría saltárselo llamando a la API); solicitudes de amistad con aceptar o rechazar (más pantallas, para más adelante); ocultar del buscador a los privados.
+- **Consecuencias:** quien vea tu colección ve también las notas de tus juegos. Como RLS ahora devuelve también juegos de otros, toda consulta a «mis juegos» debe filtrar por `user_id`: la app ya lo hacía y el MCP se ha corregido. Hasta ejecutar el SQL, los perfiles de otros se ven vacíos con un aviso.

@@ -13,6 +13,7 @@ Al terminarla, se borra de aquí.
 - **Fase 2 del MCP (OAuth).** Supabase ya está configurado: falta la página `/oauth/consent`,
   `/.well-known/oauth-protected-resource`, la cabecera `WWW-Authenticate`, tests y una guía para
   conectar Claude y ChatGPT.
+- **Ejecutar en Supabase** `sql/wishlist-hype.sql` y `sql/profiles-privacy.sql` (en ese orden).
 - **Reglas de 7 juegos** sin explicación fiable: Game Off, ¿Alguien ha probado este juego?,
   La Vacuna Española, El Cubilete, el juego de beber, Codex y Brink.
 
@@ -58,13 +59,6 @@ Una pestaña con los juegos mejor valorados de todos los usuarios, de cada grupo
   de 9 (media bayesiana); y qué se ve de otros usuarios (privacidad, RLS).
 - Seguramente una vista o función en Supabase para el ranking global.
 - Tamaño: mediano.
-
-### 5. Estadísticas en el perfil
-En cada perfil: mejor juego, el que más te gusta, el que más juegas, con el que más ganas y más
-pierdes, rachas, con quién juegas más, etc.
-- Datos: ya están (partidas, ganadores, notas, puntos).
-- Decidir: qué ve cada uno del perfil de otro.
-- Tamaño: mediano. Mucha lógica pura en `domain/` (fácil de testear).
 
 ### 6. Tiempo real de partida frente al teórico
 Al registrar una partida, que sea obligatorio poner cuánto duró. En la ficha del juego, junto al

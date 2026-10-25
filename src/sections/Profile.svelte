@@ -2,7 +2,8 @@
   import { onDestroy } from 'svelte';
   import Avatar from '../components/Avatar.svelte';
   import { localSetting } from '../data/local';
-  import { toAvatarWebp, updateNickname, uploadAvatar } from '../data/profile';
+  import { toAvatarWebp, updateNickname, updatePrivacy, uploadAvatar, type Privacy } from '../data/profile';
+  import { VISIBILITY_LABELS } from '../domain/profiles';
   import { isValidNickname } from '../domain/text';
   import { app } from '../stores/app.svelte';
   import { theme, type ThemePreference } from '../stores/theme.svelte';
@@ -20,6 +21,24 @@
   $effect(() => {
     nickname = app.nickname;
   });
+
+  let privacy = $state<Privacy>({ collection: 'friends', stats: 'friends' });
+  let privacyStatus = $state('');
+  $effect(() => {
+    if (app.privacy) privacy = { ...app.privacy };
+  });
+
+  async function savePrivacy(event: SubmitEvent) {
+    event.preventDefault();
+    privacyStatus = 'Guardando…';
+    try {
+      await updatePrivacy(app.user!.id, privacy);
+      app.privacy = { ...privacy };
+      privacyStatus = 'Privacidad guardada.';
+    } catch (error) {
+      privacyStatus = (error as Error).message;
+    }
+  }
 
   function clearPreview() {
     if (pending) URL.revokeObjectURL(pending.url);
@@ -111,6 +130,27 @@
     <p class="notice" role="status">{status}</p>
     <button class="btn" type="submit">Guardar cambios</button>
   </form>
+  {#if app.user}
+    <div class="sectionhead" style="margin-top:34px">
+      <div><h2 style="font-size:1.35rem">Privacidad</h2><p>Decide quién puede ver tu colección y tus estadísticas.</p></div>
+      <button class="btn secondary" type="button" onclick={() => app.openPerson(app.user!.id)}>Ver mi perfil</button>
+    </div>
+    {#if app.privacy}
+      <form class="card profile-card" onsubmit={savePrivacy}>
+        <div class="formgrid">
+          <div class="field"><label for="privacyCollection">Mi colección</label>
+            <select id="privacyCollection" bind:value={privacy.collection}>{#each Object.entries(VISIBILITY_LABELS) as [value, label] (value)}<option {value}>{label}</option>{/each}</select></div>
+          <div class="field"><label for="privacyStats">Mis estadísticas</label>
+            <select id="privacyStats" bind:value={privacy.stats}>{#each Object.entries(VISIBILITY_LABELS) as [value, label] (value)}<option {value}>{label}</option>{/each}</select></div>
+        </div>
+        <p class="details">«Pública»: cualquiera con cuenta. «Solo mis amigos»: las personas que tienes añadidas en Comunidad con su cuenta vinculada. «Privada»: solo tú. Quien vea tu colección verá también las notas de tus juegos.</p>
+        <p class="notice" role="status">{privacyStatus}</p>
+        <button class="btn" type="submit">Guardar privacidad</button>
+      </form>
+    {:else}
+      <p class="notice">Para elegir la privacidad, primero hay que activar los perfiles en Supabase (sql/profiles-privacy.sql).</p>
+    {/if}
+  {/if}
   <div class="sectionhead" style="margin-top:34px"><div><h2 style="font-size:1.35rem">Apariencia</h2><p>Elige un tema o sigue el que usa tu dispositivo.</p></div></div>
   <div class="theme-options theme-settings" role="group" aria-label="Elegir tema">
     {#each themes as [value, label] (value)}

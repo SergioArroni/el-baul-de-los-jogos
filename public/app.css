@@ -95,6 +95,8 @@ a{color:inherit}
 .avatar-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
 .avatar-actions[hidden]{display:none}
 .overview-spacer{flex:1}
+.people-search{max-width:420px}.people-search input{width:100%;padding-left:38px}.people-results{display:flex;flex-wrap:wrap;gap:8px}.person-result{display:inline-flex;align-items:center;gap:9px;padding:6px 14px 6px 6px;border:1px solid var(--line);border-radius:999px;background:var(--paper);color:var(--ink);font:inherit;font-weight:650;cursor:pointer}.person-result:hover{border-color:var(--green)}.person-result small{color:var(--muted);font-weight:600}
+.person-hero{display:flex;align-items:center;gap:16px;min-width:0}.person-hero h2{margin:0}.person-hero p{margin:4px 0 0}.person-hero .tags{margin-top:8px}
 .community-section{margin-top:24px;padding-top:21px;border-top:1px solid var(--line)}
 .community-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:13px}
 .community-head h3{margin:0;font-size:1.12rem;letter-spacing:-.02em}
