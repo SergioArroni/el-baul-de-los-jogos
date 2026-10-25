@@ -22,7 +22,8 @@ const data: BaulData = {
   collection: async () => ({ games: GAMES, groups: [GROUP], friends: [{ id: 'f1', name: 'Ana' }, { id: 'f2', name: 'Pepe' }] }),
   plays: async () => [play('Dixit', 'Yo', 9), play('Dixit', 'Ana', 7), play('Catan', 'Ana', 6)],
 };
-const handle = createBaulHandler({ allowedHosts: ['localhost'], dataFor: token => (token === 'good' ? data : failing) });
+const AUTH = 'https://x.supabase.co/auth/v1';
+const handle = createBaulHandler({ allowedHosts: ['localhost'], dataFor: token => (token === 'good' ? data : failing), authorizationServer: AUTH });
 const failing: BaulData = { ...data, account: async () => { throw new BaulError('Tu sesión de El Baúl no es válida o ha caducado.'); } };
 
 let id = 0;
@@ -53,6 +54,24 @@ describe('MCP endpoint', () => {
     const tools = body.result.tools as { name: string; annotations?: { readOnlyHint?: boolean } }[];
     expect(tools.map(t => t.name).sort()).toEqual(['list_games', 'list_groups', 'play_stats', 'recommend_games', 'who_am_i']);
     expect(tools.every(t => t.annotations?.readOnlyHint)).toBe(true);
+  });
+
+  it('points clients without a token to the OAuth metadata', async () => {
+    const response = await handle(new Request('http://localhost/api/mcp', { method: 'POST', headers: { host: 'localhost' } }));
+    expect(response.status).toBe(401);
+    expect(response.headers.get('WWW-Authenticate')).toBe('Bearer resource_metadata="http://localhost/.well-known/oauth-protected-resource/api/mcp"');
+    const metadata = await handle(new Request('http://localhost/.well-known/oauth-protected-resource/api/mcp', { headers: { host: 'localhost' } }));
+    expect(await metadata.json()).toEqual({
+      resource: 'http://localhost/api/mcp', authorization_servers: [AUTH], bearer_methods_supported: ['header'],
+      resource_name: 'El Baúl de los Jogos', resource_documentation: 'http://localhost/inicio',
+    });
+  });
+
+  it('asks for a new token when it has expired', async () => {
+    const checked = createBaulHandler({ allowedHosts: ['localhost'], dataFor: () => data, authorizationServer: AUTH, verify: async token => token === 'good' });
+    const response = await checked(new Request('http://localhost/api/mcp', { method: 'POST', headers: { host: 'localhost', Authorization: 'Bearer old' } }));
+    expect(response.status).toBe(401);
+    expect(response.headers.get('WWW-Authenticate')).toContain('error="invalid_token"');
   });
 
   it('rejects requests without a token or for another host', async () => {

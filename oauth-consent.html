@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#1c382b">
+<meta name="robots" content="noindex">
+<title>Conectar · El Baúl de los Jogos</title>
+<link rel="icon" type="image/png" sizes="32x32" href="/brand/favicon-32.png"><link rel="apple-touch-icon" href="/brand/apple-touch-icon.png">
+<script>const savedTheme=localStorage.getItem('el-baul-theme')||'system';if(savedTheme!=='system')document.documentElement.dataset.theme=savedTheme</script>
+<link rel="stylesheet" href="/tokens.css">
+<link rel="stylesheet" href="/app.css">
+<style>
+body{margin:0;background:var(--table);font-family:var(--font-body)}
+.consent{min-height:100svh;display:grid;place-items:center;align-content:center;gap:0;padding:28px 16px;background:radial-gradient(100% 70% at 50% 20%,#2c5a43 0%,transparent 60%),var(--table)}
+.consent-fan{margin-bottom:-26px;position:relative;z-index:0}
+.consent-card{position:relative;z-index:1;width:min(100%,460px);padding:28px 26px 22px;border:1px solid var(--line);border-radius:var(--radius-lg);background:var(--paper);color:var(--ink);box-shadow:var(--shadow-lg)}
+.consent-card .eyebrow{margin:0 0 8px;color:var(--green);font-size:.72rem;font-weight:800;letter-spacing:.13em;text-transform:uppercase}
+.consent-card h1{margin:0 0 12px;font:600 1.7rem/1.15 var(--font-display);letter-spacing:-.02em}
+.consent-card ul{margin:10px 0 14px;padding-left:1.2em;color:var(--muted)}
+.consent-who{color:var(--muted);font-size:.85rem}
+.consent-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:16px}
+.consent-actions .btn:not(.ghost){background:var(--gold);color:#1d2923}
+</style>
+</head>
+<body>
+<div id="consent"></div>
+<script src="/supabase-config.js"></script>
+<script type="module" src="/src/consent/main.ts"></script>
+</body>
+</html>

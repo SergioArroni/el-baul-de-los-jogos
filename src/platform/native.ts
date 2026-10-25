@@ -10,8 +10,12 @@ import { StatusBar, Style } from '@capacitor/status-bar';
 
 export const isNative = Capacitor.isNativePlatform();
 
-/** Inside the APK the pages are served from https://localhost, so server calls need the full address. */
-export const WEB_ORIGIN = 'https://el-baul-de-los-jogos.vercel.app';
+/**
+ * Inside the APK the pages are served from https://localhost, so server calls need the full
+ * address: the dev APK talks to the dev deployment and the main one to production, so an
+ * APK never expects a server newer than the one it calls.
+ */
+export const WEB_ORIGIN = import.meta.env.VITE_WEB_ORIGIN || 'https://el-baul-de-los-jogos.vercel.app';
 export const apiUrl = (path: string): string => (isNative ? WEB_ORIGIN : '') + path;
 
 /** Light tap feedback for actions that change something (vote, rate, save). */

@@ -30,6 +30,7 @@ export default defineConfig({
         admin: resolve(import.meta.dirname, 'admin.html'),
         deleteAccount: resolve(import.meta.dirname, 'borrar-cuenta.html'),
         landing: resolve(import.meta.dirname, 'inicio.html'),
+        consent: resolve(import.meta.dirname, 'oauth-consent.html'),
       },
     },
   },

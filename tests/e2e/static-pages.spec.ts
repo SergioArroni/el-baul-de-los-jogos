@@ -30,3 +30,12 @@ test('the public page explains how to delete an account', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Borrar tu cuenta' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Entrar para borrar mi cuenta' })).toHaveAttribute('href', '/login.html');
 });
+
+test('the consent page for Claude/ChatGPT loads and explains what is missing', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await page.goto('/oauth/consent');
+  await expect(page.getByRole('heading', { name: 'Conectar con El Baúl de los Jogos' })).toBeVisible();
+  await expect(page.getByRole('status')).not.toHaveText('Comprobando tu sesión…');
+  expect(errors).toEqual([]);
+});

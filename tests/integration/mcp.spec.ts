@@ -86,3 +86,14 @@ test('group statistics and recommendations come from the real plays', async ({ r
 test('asks to sign in when there is no token', async ({ request }) => {
   expect((await rpc(request, 'tools/list', {}, null)).status).toBe(401);
 });
+
+test('without a token, the 401 points to the OAuth metadata, which names Supabase as the issuer', async ({ request }) => {
+  const response = await request.post(MCP_URL!, { data: { jsonrpc: '2.0', id: 1, method: 'tools/list', params: {} } });
+  expect(response.status()).toBe(401);
+  const challenge = response.headers()['www-authenticate'];
+  const metadataUrl = challenge.match(/resource_metadata="([^"]+)"/)?.[1];
+  expect(metadataUrl).toMatch(/\/\.well-known\/oauth-protected-resource\/mcp$/);
+  const metadata = await (await request.get(metadataUrl!)).json();
+  expect(metadata.resource).toMatch(/\/mcp$/);
+  expect(metadata.authorization_servers).toEqual(['http://localhost:8790/auth/v1']);
+});

@@ -3,7 +3,25 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "rewrites": [
-    { "source": "/inicio", "destination": "/inicio.html" },
-    { "source": "/privacidad", "destination": "/privacidad.html" }
+    {
+      "source": "/inicio",
+      "destination": "/inicio.html"
+    },
+    {
+      "source": "/privacidad",
+      "destination": "/privacidad.html"
+    },
+    {
+      "source": "/oauth/consent",
+      "destination": "/oauth-consent.html"
+    },
+    {
+      "source": "/.well-known/oauth-protected-resource",
+      "destination": "/api/oauth-protected-resource"
+    },
+    {
+      "source": "/.well-known/oauth-protected-resource/api/mcp",
+      "destination": "/api/oauth-protected-resource"
+    }
   ]
 }

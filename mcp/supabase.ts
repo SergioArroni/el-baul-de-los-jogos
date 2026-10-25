@@ -9,6 +9,25 @@ import { BaulError, type Account, type BaulData } from './server';
 const DEFAULT_URL = 'https://ibllpkczcsjxqzszwiby.supabase.co';
 const DEFAULT_KEY = 'sb_publishable_Q1uBq8AgBRhSLRfYIqW7lA_zhwj6KeR';
 
+type Env = Record<string, string | undefined>;
+/** Supabase Auth's OAuth 2.1 server, which issues the tokens MCP clients bring. */
+export const authorizationServer = (env: Env = process.env): string => (env.SUPABASE_URL ?? DEFAULT_URL) + '/auth/v1';
+
+// Tokens already checked, so each MCP request doesn't ask Supabase again (5 minutes).
+const verified = new Map<string, number>();
+/** True when Supabase accepts the token as a signed-in user. */
+export async function verifyToken(token: string, env: Env = process.env): Promise<boolean> {
+  if ((verified.get(token) ?? 0) > Date.now()) return true;
+  const client = createClient(env.SUPABASE_URL ?? DEFAULT_URL, env.SUPABASE_PUBLISHABLE_KEY ?? DEFAULT_KEY, {
+    auth: { autoRefreshToken: false, persistSession: false, detectSessionInUrl: false },
+  });
+  const { data, error } = await client.auth.getUser(token);
+  if (error || !data.user) return false;
+  if (verified.size > 1000) verified.clear();
+  verified.set(token, Date.now() + 5 * 60_000);
+  return true;
+}
+
 /** Stored games may miss fields (old saves, hand-made rows); give the domain logic complete objects. */
 const completeGame = (data: Partial<StoredGame>) => normalizeGamePlace({
   id: data.id ?? '', name: data.name ?? '', players: data.players ?? '', types: Array.isArray(data.types) ? data.types : [],

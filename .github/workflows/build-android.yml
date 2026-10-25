@@ -27,8 +27,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
       # The app ships inside the APK (webDir: dist), so build it first.
+      # The APK calls the server of its own branch: dev → the dev preview, main → production.
       - name: Build web app
         run: npm run build
+        env:
+          VITE_WEB_ORIGIN: ${{ github.ref_name == 'main' && 'https://el-baul-de-los-jogos.vercel.app' || 'https://el-baul-de-los-jogos-git-dev-deus20.vercel.app' }}
       - name: Create Android project
         run: npm run android:add
       - name: Generate app icon and splash screen from assets/

@@ -1,0 +1,44 @@
+# Conectar El Baúl de los Jogos con Claude o ChatGPT
+
+Con el conector puedes preguntar a tu asistente cosas como «¿qué cooperativo para 5 tenemos en
+casa de Enzo?» o «¿quién gana más al Carcassonne?». Solo puede **leer** tu baúl: no cambia nada.
+
+- **Dirección del conector:** `https://el-baul-de-los-jogos.vercel.app/api/mcp`
+- **Inicio de sesión:** OAuth. Al conectar, te pedirá entrar con tu cuenta del Baúl y darle permiso.
+- **Coste:** ninguno para el Baúl; usas tu propia cuenta de Claude o ChatGPT.
+
+## Claude (claude.ai o la app de escritorio)
+1. Abre **Ajustes → Conectores** y pulsa **Añadir conector personalizado**.
+2. Nombre: `El Baúl de los Jogos`. URL: la de arriba. Guarda.
+3. Pulsa **Conectar**. Se abre una ventana: entra con tu correo o apodo del Baúl.
+4. Verás «¿Dejas que Claude vea tu baúl?». Pulsa **Permitir**.
+5. En una conversación, activa el conector y pregunta lo que quieras.
+
+## ChatGPT
+Los conectores propios dependen del plan (algunos planes de pago) y a veces del «modo desarrollador».
+1. Abre **Ajustes → Aplicaciones y conectores** (o **Conectores**) y crea uno nuevo.
+2. Pon la URL de arriba y elige autenticación **OAuth**.
+3. Al conectar, entra con tu cuenta del Baúl y pulsa **Permitir**.
+
+Los menús de ambas apps cambian a menudo: si algún nombre no coincide, busca «conector» o «MCP» en
+sus ajustes.
+
+## Qué puede hacer
+- `who_am_i`: con qué cuenta está conectado.
+- `list_games`: tus juegos, con filtros por nombre, estilo o jugadores.
+- `list_groups`: tus grupos y los compartidos contigo.
+- `recommend_games`: a qué jugar según cuántos sois, el grupo, el estilo, la dureza y el tiempo.
+- `play_stats`: partidas, ganadores y notas.
+
+## Quitar el acceso
+Borra el conector en Claude o ChatGPT. El permiso caduca solo y, si borras tu cuenta del Baúl,
+deja de funcionar al momento.
+
+## Cómo funciona por dentro
+1. El asistente llama a `/api/mcp` sin token y recibe un 401 que apunta a
+   `/.well-known/oauth-protected-resource/api/mcp`.
+2. Ese documento dice que los permisos los da Supabase (`…supabase.co/auth/v1`).
+3. El asistente se registra solo en Supabase (registro dinámico) y te manda a la página de permiso
+   del Baúl (`/oauth/consent`).
+4. Con tu «Permitir», Supabase le da un token a tu nombre; el servidor MCP lo comprueba y consulta
+   Supabase con él, así que las reglas RLS aplican igual que en la app.

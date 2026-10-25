@@ -170,20 +170,59 @@ export interface BaulHandlerOptions {
   allowedHosts: string[];
   /** The data port for a caller, given their bearer token. */
   dataFor: (token: string) => BaulData;
+  /** Who issues the tokens: Supabase Auth's OAuth 2.1 server (…/auth/v1). */
+  authorizationServer: string;
+  /** Path of the MCP endpoint on this host (default /api/mcp). */
+  mcpPath?: string;
+  /** Checks a token before using it; an expired one gets a 401 so the client renews it. */
+  verify?: (token: string) => Promise<boolean>;
+}
+
+const METADATA = '/.well-known/oauth-protected-resource';
+
+/**
+ * The OAuth "protected resource" description (RFC 9728). MCP clients such as Claude
+ * read it after a 401 to learn who issues tokens for this server, then sign the
+ * person in there (Supabase shows our consent page) and come back with a token.
+ */
+export const protectedResource = (origin: string, mcpPath: string, authorizationServer: string) => ({
+  resource: origin + mcpPath,
+  authorization_servers: [authorizationServer],
+  bearer_methods_supported: ['header'],
+  resource_name: 'El Baúl de los Jogos',
+  resource_documentation: origin + '/inicio',
+});
+
+/** The public origin of a request (Vercel puts the real host in x-forwarded-* headers). */
+export function requestOrigin(request: Request): string {
+  const url = new URL(request.url);
+  const host = request.headers.get('x-forwarded-host') ?? url.host;
+  const protocol = request.headers.get('x-forwarded-proto') ?? url.protocol.replace(':', '');
+  return `${protocol}://${host}`;
 }
 
 const json = (status: number, body: object, headers: Record<string, string> = {}) =>
   new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json', ...headers } });
 
 /** The /api/mcp endpoint as a web-standard handler: Request in, Response out. */
-export function createBaulHandler({ allowedHosts, dataFor }: BaulHandlerOptions): (request: Request) => Promise<Response> {
+export function createBaulHandler(options: BaulHandlerOptions): (request: Request) => Promise<Response> {
+  const { allowedHosts, dataFor, authorizationServer, mcpPath = '/api/mcp', verify } = options;
   const mcp = createMcpHandler(({ authInfo }) => buildServer(dataFor(authInfo!.token)), { responseMode: 'json' });
   return async request => {
     const rejected = hostHeaderValidationResponse(request, allowedHosts);
     if (rejected) return rejected;
+    const origin = requestOrigin(request);
+    const path = new URL(request.url).pathname;
+    if (request.method === 'GET' && (path === METADATA || path === METADATA + mcpPath)) {
+      return json(200, protectedResource(origin, mcpPath, authorizationServer), { 'Access-Control-Allow-Origin': '*' });
+    }
+    // 401 says "sign in first" and points to the metadata above, which starts the OAuth flow.
+    const challenge = (extra = '') => ({ 'WWW-Authenticate': `Bearer ${extra}resource_metadata="${origin}${METADATA}${mcpPath}"` });
     const token = request.headers.get('authorization')?.match(/^Bearer\s+(\S+)$/i)?.[1];
-    // Without a token there is nothing to show: 401 tells MCP clients they must sign in.
-    if (!token) return json(401, { error: 'Conecta tu cuenta de El Baúl de los Jogos.' }, { 'WWW-Authenticate': 'Bearer' });
+    if (!token) return json(401, { error: 'Conecta tu cuenta de El Baúl de los Jogos.' }, challenge());
+    if (verify && !(await verify(token))) {
+      return json(401, { error: 'Tu sesión de El Baúl no es válida o ha caducado.' }, challenge('error="invalid_token", '));
+    }
     return mcp.fetch(request, { authInfo: { token, clientId: 'el-baul-de-los-jogos', scopes: [] } });
   };
 }

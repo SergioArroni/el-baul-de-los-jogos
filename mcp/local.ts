@@ -3,12 +3,14 @@
 // SUPABASE_URL / SUPABASE_PUBLISHABLE_KEY choose the backend (tests point it at the Docker stack).
 import { createServer } from 'node:http';
 import { createBaulHandler } from './server';
-import { supabaseData } from './supabase';
+import { authorizationServer, supabaseData } from './supabase';
 
 const port = Number(process.env.MCP_PORT ?? 8791);
 const handle = createBaulHandler({
   allowedHosts: ['localhost', '127.0.0.1'],
   dataFor: token => supabaseData(token),
+  authorizationServer: authorizationServer(),
+  mcpPath: '/mcp',
 });
 
 // Node's http server speaks IncomingMessage/ServerResponse; the handler speaks Request/Response.
