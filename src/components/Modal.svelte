@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
+  import { cardEnter } from '../motion';
 
   interface Props {
     open: boolean;
@@ -23,7 +24,7 @@
   <!-- Clicking the dimmed backdrop closes the dialog; Escape does the same from the keyboard. -->
   <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
   <div class="modal open" onclick={event => { if (event.target === event.currentTarget) onclose(); }}>
-    <div class="dialog {dialogClass}" role="dialog" aria-modal="true" aria-labelledby={id}>
+    <div class="dialog {dialogClass}" use:cardEnter role="dialog" aria-modal="true" aria-labelledby={id}>
       {#if header}
         {@render header()}
       {:else}

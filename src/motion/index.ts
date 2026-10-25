@@ -44,9 +44,11 @@ function firstTime(key: string | undefined): boolean {
 export function deal(node: HTMLElement, options: { selector?: string; once?: string; limit?: number } = {}) {
   if (prefersReducedMotion() || !firstTime(options.once)) return {};
   const cards = gsap.utils.toArray<HTMLElement>(node.querySelectorAll(options.selector ?? ':scope > *')).slice(0, options.limit ?? 18);
+  // CSS transitions on transform (hover effects) would fight GSAP: off while dealing.
+  gsap.set(cards, { transition: 'none' });
   gsap.from(cards, {
     opacity: 0, y: 46, scale: 0.88, rotation: () => gsap.utils.random(-9, 9),
-    duration: 0.6, stagger: 0.045, ease: 'back.out(1.5)', clearProps: 'opacity,transform',
+    duration: 0.6, stagger: 0.045, ease: 'back.out(1.5)', clearProps: 'opacity,transform,transition',
   });
   return {};
 }
@@ -85,8 +87,11 @@ export function flipList(container: () => HTMLElement | undefined, selector: str
     },
     play() {
       if (!state) return;
+      const moving = state.targets;
+      gsap.set(moving, { transition: 'none' });
       Flip.from(state, {
         duration: 0.45, ease: 'power2.inOut', nested: true,
+        onComplete: () => void gsap.set(moving, { clearProps: 'transition' }),
         onEnter: entering => gsap.fromTo(entering, { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: 0.35, clearProps: 'opacity,transform' }),
       });
       state = null;
@@ -113,6 +118,14 @@ export function cardEnter(node: HTMLElement) {
       }
     : { y: 30, scale: 0.94, rotationY: 0 };
   gsap.from(node, { ...start, opacity: 0.2, transformPerspective: 1100, duration: 0.5, ease: 'power3.out', clearProps: 'opacity,transform' });
+  return {};
+}
+
+/** Svelte action: drops the element in with a bounce, when `play` is true (a meeple just placed). */
+export function drop(node: HTMLElement, play: boolean) {
+  if (play && !prefersReducedMotion()) {
+    gsap.from(node, { y: -80, rotation: -30, opacity: 0, duration: 0.75, ease: 'bounce.out', clearProps: 'opacity,transform' });
+  }
   return {};
 }
 

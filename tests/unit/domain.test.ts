@@ -6,7 +6,7 @@ import { maxPlayers, playerRange, supports } from '../../src/domain/players';
 import { recommend } from '../../src/domain/recommend';
 import { signedOutPage } from '../../src/domain/routes';
 import { needsPlaceMigration, normalizeGamePlace, seedGames, withDefaultPlaces } from '../../src/domain/seed';
-import { playStats } from '../../src/domain/stats';
+import { median, playStats, realDuration } from '../../src/domain/stats';
 import { diffRows, snapshotOf } from '../../src/domain/sync';
 import { isValidNickname, localToday, nameKey, nicknameSuggestion, safeHttpUrl, withSuffix } from '../../src/domain/text';
 import type { Friend, Game, Group, Play } from '../../src/domain/types';
@@ -205,5 +205,20 @@ describe('signed-out visitors', () => {
     expect(signedOutPage(false, '')).toBe('/inicio');
     expect(signedOutPage(true, '')).toBe('login.html');
     expect(signedOutPage(false, '#access_token=x&type=recovery')).toBe('login.html#access_token=x&type=recovery');
+  });
+});
+
+describe('real play time', () => {
+  const timed = (minutes: number | null, name = 'Azul') => play({ game_name: name, duration_minutes: minutes });
+
+  it('takes the middle value, so one endless play does not drag it', () => {
+    expect(median([30, 40, 600])).toBe(40);
+    expect(median([30, 40, 50, 60])).toBe(45);
+    expect(median([])).toBeNull();
+  });
+
+  it('only shows a real time with at least three timed plays of that game', () => {
+    expect(realDuration([timed(40), timed(50), timed(null)], 'Azul')).toBeNull();
+    expect(realDuration([timed(40), timed(50), timed(70), timed(20, 'Catan')], 'azul')).toBe(50);
   });
 });

@@ -70,6 +70,8 @@ export interface Play {
   played_on: string;
   place: string | null;
   notes: string | null;
+  /** How long it lasted. Missing in old plays and before sql/plays-duration.sql. */
+  duration_minutes?: number | null;
   created_at: string;
   play_players: PlayPlayer[];
 }

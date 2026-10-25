@@ -61,3 +61,21 @@ export function playStats(plays: Play[]): PlayStats {
       .slice(0, 3),
   };
 }
+
+/** The middle value: one endless game (or a typo like 600 instead of 60) doesn't drag it. */
+export function median(values: number[]): number | null {
+  if (!values.length) return null;
+  const sorted = [...values].sort((a, b) => a - b);
+  const middle = Math.floor(sorted.length / 2);
+  return sorted.length % 2 ? sorted[middle] : (sorted[middle - 1] + sorted[middle]) / 2;
+}
+
+/** A real duration is only shown once there are this many timed plays. */
+export const MIN_TIMED_PLAYS = 3;
+
+/** Median real length of a game from the plays you can see, or null without enough timed plays. */
+export function realDuration(plays: Play[], gameName: string): number | null {
+  const key = nameKey(gameName);
+  const minutes = plays.filter(play => nameKey(play.game_name) === key && play.duration_minutes).map(play => play.duration_minutes!);
+  return minutes.length >= MIN_TIMED_PLAYS ? Math.round(median(minutes)!) : null;
+}

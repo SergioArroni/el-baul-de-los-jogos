@@ -65,6 +65,9 @@ test('A logs a play in the group with points, winner and a rating', async ({ bro
   const form = page.getByRole('dialog', { name: 'Registrar partida' });
   await expect(form.locator('.play-score-row')).toHaveCount(3);
   await form.getByLabel('Juego *').fill('Carcassonne');
+  await form.getByRole('button', { name: 'Guardar partida' }).click();
+  await expect(form.getByText('Indica cuánto duró la partida')).toBeVisible();
+  await form.getByLabel('¿Cuánto duró? (min) *').fill('50');
   await form.getByLabel('Puntos de usuario_a').fill('52');
   await form.getByLabel('Puntos de usuario_b').fill('47');
   await form.locator('.play-score-row').first().locator('.winner-toggle').click();

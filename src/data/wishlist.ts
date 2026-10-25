@@ -30,7 +30,8 @@ export async function deleteProposal(id: string, userId: string): Promise<void> 
   if (error) throw error;
 }
 
-export async function setCatan(gameId: string, userId: string, give: boolean): Promise<void> {
+/** Places or takes back your meeple on a proposal (the database allows 3 per person). */
+export async function setMeeple(gameId: string, userId: string, give: boolean): Promise<void> {
   const db = requireClient();
   const { error } = give
     ? await db.from('wishlist_votes').insert({ game_id: gameId, user_id: userId })

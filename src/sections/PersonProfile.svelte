@@ -5,6 +5,7 @@
   import { loadPersonCollection, loadPersonProfile, loadPersonStats, type PersonProfile } from '../data/people';
   import { byName } from '../domain/catalog';
   import { canSee, profileHighlights } from '../domain/profiles';
+  import { countUp } from '../motion';
   import { formatDecimal } from '../domain/text';
   import type { Game, PersonGameStat, Visibility } from '../domain/types';
   import { app } from '../stores/app.svelte';
@@ -101,8 +102,8 @@
         <p class="notice">Todavía no hay partidas registradas.</p>
       {:else}
         <div class="stats-grid">
-          <div class="stat-tile"><small>Partidas</small><strong>{highlights.plays}</strong></div>
-          <div class="stat-tile"><small>Victorias</small><strong>{highlights.wins}</strong>{#if highlights.winRate != null}<span class="sub">{percent(highlights.winRate)} de las partidas</span>{/if}</div>
+          <div class="stat-tile"><small>Partidas</small><strong use:countUp={highlights.plays}>{highlights.plays}</strong></div>
+          <div class="stat-tile"><small>Victorias</small><strong use:countUp={highlights.wins}>{highlights.wins}</strong>{#if highlights.winRate != null}<span class="sub">{percent(highlights.winRate)} de las partidas</span>{/if}</div>
           {#if highlights.mostPlayed}<div class="stat-tile"><small>El que más juega</small><strong>{highlights.mostPlayed.game_name}</strong><span class="sub">{plays(highlights.mostPlayed.plays)}</span></div>{/if}
           {#if highlights.favourite}<div class="stat-tile"><small>El que más le gusta</small><strong>{highlights.favourite.game_name}</strong><span class="sub">★ {formatDecimal(highlights.favourite.rating ?? 0)} de nota media</span></div>{/if}
           {#if highlights.best}<div class="stat-tile"><small>Su mejor juego</small><strong>{highlights.best.game_name}</strong><span class="sub">Gana el {percent(highlights.best.winRate)}</span></div>{/if}

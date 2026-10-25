@@ -17,7 +17,11 @@ export async function loadPlays(): Promise<PlaysResult> {
   return { plays: data as Play[], missing: false };
 }
 
-export type PlayRow = Pick<Play, 'game_name' | 'played_on' | 'place' | 'notes' | 'group_owner' | 'group_key' | 'group_name'>;
+export type PlayRow = Pick<Play, 'game_name' | 'played_on' | 'place' | 'notes' | 'group_owner' | 'group_key' | 'group_name' | 'duration_minutes'>;
+
+/** PGRST204: the duration column doesn't exist yet (sql/plays-duration.sql not run). */
+const missingDuration = (error: { code?: string; message?: string } | null) => error?.code === 'PGRST204' && /duration_minutes/.test(error.message ?? '');
+const withoutDuration = ({ duration_minutes: _, ...row }: PlayRow) => row;
 
 /** A player in the form; `rowId` is set for players already saved. */
 export interface PlayerDraft {
@@ -40,11 +44,13 @@ export async function savePlay(row: PlayRow, players: PlayerDraft[], me: string,
   let created = false;
   try {
     if (existing) {
-      const { error } = await db.from('plays').update(row).eq('id', existing.id);
+      let { error } = await db.from('plays').update(row).eq('id', existing.id);
+      if (missingDuration(error)) ({ error } = await db.from('plays').update(withoutDuration(row)).eq('id', existing.id));
       if (error) throw error;
     } else {
-      const { data, error } = await db.from('plays').insert(row).select('id').single();
-      if (error) throw error;
+      let { data, error } = await db.from('plays').insert(row).select('id').single();
+      if (missingDuration(error)) ({ data, error } = await db.from('plays').insert(withoutDuration(row)).select('id').single());
+      if (error || !data) throw error ?? new Error('No se pudo guardar la partida.');
       id = data.id as string;
       created = true;
     }

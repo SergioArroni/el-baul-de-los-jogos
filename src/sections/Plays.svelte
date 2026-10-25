@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { countUp } from '../motion';
   import Avatar from '../components/Avatar.svelte';
   import { ratePlay } from '../data/plays';
   import { tap } from '../platform/native';
@@ -81,7 +82,7 @@
     <div class="play-view-head"><button class="btn ghost small" onclick={() => (app.playView = null)}>← Grupos</button><h3>{view.name}</h3></div>
     {#if view.plays.length && stats}
       <div class="stats-grid">
-        <div class="stat-tile"><small>Partidas</small><strong>{view.plays.length}</strong></div>
+        <div class="stat-tile"><small>Partidas</small><strong use:countUp={view.plays.length}>{view.plays.length}</strong></div>
         {#if stats.mostPlayed}
           <div class="stat-tile"><small>Más jugado</small><strong>{stats.mostPlayed.name}</strong><span class="sub">{stats.mostPlayed.count} {stats.mostPlayed.count === 1 ? 'vez' : 'veces'}</span></div>
         {/if}

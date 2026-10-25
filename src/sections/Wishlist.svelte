@@ -1,7 +1,8 @@
 <script lang="ts">
-  import Avatar from '../components/Avatar.svelte';
+  import MeepleToken from '../components/MeepleToken.svelte';
   import Modal from '../components/Modal.svelte';
-  import { deleteProposal, proposeGame, setCatan } from '../data/wishlist';
+  import { deleteProposal, proposeGame, setMeeple } from '../data/wishlist';
+  import { MEEPLES, meeplesLeft } from '../domain/wishlist';
   import { safeHttpUrl } from '../domain/text';
   import { tap } from '../platform/native';
   import type { WishlistGame, WishlistHype } from '../domain/types';
@@ -17,11 +18,19 @@
   const HYPE: Record<WishlistHype, string> = { culo: 'Me lo meto por el culo', 'le-daba': 'Yo le daba', 'y-si-si': '¿Y si sí?' };
 
   const euros = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' });
-  /** Most catanes first, then newest. */
+  /** Most meeples first, then newest. */
   const ranked = $derived(app.wishlist
     .map(game => ({ game, voters: app.votes.filter(v => v.game_id === game.id).map(v => v.user_id) }))
     .sort((a, b) => b.voters.length - a.voters.length || new Date(b.game.created_at).getTime() - new Date(a.game.created_at).getTime()));
-  const voterName = (id: string) => (id === app.user?.id ? 'Tú' : '@' + (app.people.get(id)?.nickname ?? '?'));
+  const left = $derived(app.user ? meeplesLeft(app.votes, app.user.id) : 0);
+  /** The proposal that just got your meeple, so only that one drops in. */
+  let justPlaced = $state('');
+
+  function toggleMeeple(game: WishlistGame, placed: boolean) {
+    tap();
+    justPlaced = placed ? '' : game.id;
+    void run(() => setMeeple(game.id, app.user!.id, !placed));
+  }
 
   async function run(action: () => Promise<void>) {
     status = '';
@@ -60,16 +69,17 @@
   }
 
   async function remove(game: WishlistGame) {
-    if (await askConfirm({ title: '¿Quitar esta propuesta?', text: 'Desaparecerá de la lista compartida junto con sus catanes.', confirmLabel: 'Quitar', danger: true }))
+    if (await askConfirm({ title: '¿Quitar esta propuesta?', text: 'Desaparecerá de la lista compartida, con todos sus meeples.', confirmLabel: 'Quitar', danger: true }))
       await run(() => deleteProposal(game.id, app.user!.id));
   }
 </script>
 
 <section class="panel active">
   <div class="sectionhead">
-    <div><h2>Próximos juegos</h2><p>Añade juegos que os interesen y votad con catanes cuál comprar después.</p></div>
+    <div><h2>Próximos juegos</h2><p>Proponed juegos y poned vuestros meeples en los que más os apetecen: cada uno tiene {MEEPLES}. El que más junte, al carrito.</p></div>
     <button class="btn" onclick={startProposal}>＋ Proponer juego</button>
   </div>
+  {#if app.user}<p class="meeple-left"><span class="meeples">{#each Array.from({ length: MEEPLES }) as _, i (i)}<span class="meeple" class:used={i >= left}></span>{/each}</span> Te {left === 1 ? 'queda' : 'quedan'} {left} {left === 1 ? 'meeple' : 'meeples'}</p>{/if}
   <p class="notice" role="status">{app.user ? status : 'Inicia sesión para ver y proponer compras compartidas.'}</p>
   <div class="grid">
     {#if !app.user}
@@ -87,17 +97,15 @@
           <div class="tags">
             <span class="tag green">{game.price == null ? 'Precio por confirmar' : euros.format(game.price)}</span>
             {#if game.hype && HYPE[game.hype]}<span class="tag">Ganas: {HYPE[game.hype]}</span>{/if}
-            <span class="tag">{voters.length} {voters.length === 1 ? 'catán' : 'catanes'}</span>
-            {#if voters.length}
-              <span class="voters" title={voters.map(voterName).join(', ')}>
-                {#each voters as voter (voter)}<Avatar userId={voter} name={app.people.get(voter)?.nickname} size="tiny" />{/each}
-              </span>
-            {/if}
+            <span class="meeple-row" aria-label="{voters.length} {voters.length === 1 ? 'meeple' : 'meeples'}">
+              {#each voters as voter (voter)}<MeepleToken userId={voter} fresh={voter === app.user.id && justPlaced === game.id} />{/each}
+              {#if !voters.length}<span class="meeple-empty">Sin meeples</span>{/if}
+            </span>
           </div>
           {#if game.notes}<p class="details">{game.notes}</p>{/if}
           <div class="cardfoot">
             {#if url}<a class="btn secondary" href={url} target="_blank" rel="noopener noreferrer">Ver ficha / tienda</a>{/if}
-            <button class="btn {voted ? 'secondary' : 'ghost'}" onclick={() => { tap(); run(() => setCatan(game.id, app.user!.id, !voted)); }}>{voted ? '★ Ya tiene mi catán' : '☆ Dar un catán'}</button>
+            <button class="btn {voted ? 'secondary' : 'ghost'}" disabled={!voted && !left} onclick={() => toggleMeeple(game, voted)}>{voted ? 'Quitar mi meeple' : left ? 'Poner mi meeple' : 'Sin meeples libres'}</button>
             {#if game.user_id === app.user.id}<button class="btn ghost" onclick={() => remove(game)}>Quitar</button>{/if}
           </div>
         </article>

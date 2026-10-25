@@ -2,7 +2,7 @@
   import Modal from '../components/Modal.svelte';
   import { coverUrl, findInLibrary } from '../content/library';
   import { gameArt } from '../domain/art';
-  import { averageRating } from '../domain/stats';
+  import { averageRating, realDuration } from '../domain/stats';
   import { formatDecimal, formatShortDate, nameKey } from '../domain/text';
   import type { Game } from '../domain/types';
   import { app } from '../stores/app.svelte';
@@ -24,6 +24,7 @@
   const rules = $derived(entry?.rules);
   const stat = $derived(game ? app.stats.games.get(nameKey(game.name)) : undefined);
   const rating = $derived(averageRating(stat));
+  const realMinutes = $derived(game ? realDuration(app.plays, game.name) : null);
   const canPlay = $derived(!!app.user && !app.playsMissing);
   const facts = $derived(game ? [
     `👥 ${game.players || 'Jugadores por confirmar'}`,
@@ -48,6 +49,7 @@
   {#if game}
     <div class="detail-body">
       <h2 id="detailTitle">{game.name}</h2>
+      {#if realMinutes}<p class="real-time">⏱ {game.duration ? `${game.duration} min en la caja · ` : ''}<strong>{realMinutes} min de verdad</strong></p>{/if}
       <div class="tags">
         {#each facts as fact (fact)}<span class="tag">{fact}</span>{/each}
         {#each game.types as type (type)}<span class="tag green">{type}</span>{/each}

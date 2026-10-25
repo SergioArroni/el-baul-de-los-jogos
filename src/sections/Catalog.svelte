@@ -1,8 +1,10 @@
 <script lang="ts">
+  import { untrack } from 'svelte';
   import GameCover from '../components/GameCover.svelte';
   import { typeEmoji } from '../domain/art';
   import { buildShelves, byName, filterGames, noFilters, topTypes, type CatalogFilters } from '../domain/catalog';
   import type { Game } from '../domain/types';
+  import { deal, flipList } from '../motion';
   import { app, type Tab } from '../stores/app.svelte';
   import { askConfirm } from '../stores/confirm.svelte';
   import GameDetail from './GameDetail.svelte';
@@ -20,6 +22,18 @@
   const types = $derived.by(() => {
     const list = topTypes(app.games);
     return filters.type && !list.includes(filters.type) ? [...list, filters.type] : list;
+  });
+
+  // When the filters change, the cards slide to their new places instead of jumping.
+  let resultsGrid = $state<HTMLElement>();
+  const flip = flipList(() => resultsGrid, '.cover');
+  $effect.pre(() => {
+    void results;
+    untrack(() => flip.capture());
+  });
+  $effect(() => {
+    void results;
+    flip.play();
   });
 
   const clearFilters = () => (filters = { search: '', type: '', players: 0, place: '' });
@@ -79,7 +93,7 @@
         <button class="btn ghost small" type="button" onclick={clearFilters}>Quitar filtros</button>
       </div>
       {#if results.length}
-        <div class="cover-grid">{#each results as game (game.id)}<GameCover {game} onopen={g => (detail = g)} />{/each}</div>
+        <div class="cover-grid" bind:this={resultsGrid}>{#each results as game (game.id)}<GameCover {game} onopen={g => (detail = g)} />{/each}</div>
       {:else}
         <div class="empty">No hay juegos con esos filtros. Prueba a cambiar la búsqueda.</div>
       {/if}
@@ -88,12 +102,12 @@
     {#each shelves as shelf (shelf.title)}
       <section class="shelf">
         <div class="shelf-head"><h2>{shelf.title}</h2><span>{shelf.games.length}</span></div>
-        <div class="shelf-row">{#each shelf.games as game (game.id)}<GameCover {game} onopen={g => (detail = g)} />{/each}</div>
+        <div class="shelf-row" use:deal={{ once: "shelf:" + shelf.title, limit: 8 }}>{#each shelf.games as game (game.id)}<GameCover {game} onopen={g => (detail = g)} />{/each}</div>
       </section>
     {/each}
     <section class="shelf">
       <div class="shelf-head"><h2>Toda la colección</h2><span>{app.games.length}</span></div>
-      <div class="cover-grid">{#each [...app.games].sort(byName) as game (game.id)}<GameCover {game} onopen={g => (detail = g)} />{/each}</div>
+      <div class="cover-grid" use:deal={{ once: "catalog" }}>{#each [...app.games].sort(byName) as game (game.id)}<GameCover {game} onopen={g => (detail = g)} />{/each}</div>
     </section>
   {/if}
 

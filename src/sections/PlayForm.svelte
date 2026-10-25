@@ -24,7 +24,7 @@
   interface Candidate { key: string; name: string; userId: string | null }
   type Draft = PlayerDraft & { key: string };
 
-  let form = $state({ game: '', date: '', group: '', place: '', notes: '' });
+  let form = $state({ game: '', date: '', minutes: '', group: '', place: '', notes: '' });
   let players = $state<Draft[]>([]);
   let status = $state('');
   let saving = $state(false);
@@ -77,6 +77,7 @@
     form = {
       game: play?.game_name ?? presetGame,
       date: play?.played_on ?? localToday(),
+      minutes: play?.duration_minutes ? String(play.duration_minutes) : '',
       group: play ? playGroupKey(play) : groupOptions.some(o => o.key === presetGroup) ? presetGroup : '',
       place: play?.place ?? '',
       notes: play?.notes ?? '',
@@ -100,6 +101,11 @@
       status = 'Marca al menos un jugador.';
       return;
     }
+    const minutes = Math.round(Number(form.minutes));
+    // New plays need their length (old ones may not have it).
+    if (form.minutes || !play) {
+      if (!(minutes >= 1 && minutes <= 1440)) return void (status = 'Indica cuánto duró la partida, en minutos (de 1 a 1440).');
+    }
     const group = app.groups.find(g => app.groupKey(g) === form.group);
     const key = splitGroupKey(form.group);
     saving = true;
@@ -107,6 +113,7 @@
     try {
       await savePlay({
         game_name: form.game.trim(), played_on: form.date, place: form.place || null, notes: form.notes.trim() || null,
+        duration_minutes: form.minutes ? minutes : null,
         group_owner: key?.owner ?? null, group_key: key?.id ?? null, group_name: key ? group?.name ?? play?.group_name ?? null : null,
       }, $state.snapshot(players), me, play);
       tap();
@@ -145,6 +152,7 @@
         <datalist id="playGameList">{#each app.games as g (g.id)}<option value={g.name}></option>{/each}</datalist>
       </div>
       <div class="field"><label for="playDate">Fecha *</label><input id="playDate" type="date" required bind:value={form.date} /></div>
+      <div class="field"><label for="playMinutes">¿Cuánto duró? (min){play ? '' : ' *'}</label><input id="playMinutes" type="number" min="1" max="1440" inputmode="numeric" placeholder="Ej. 45" bind:value={form.minutes} /></div>
       <div class="field">
         <label for="playGroup">Grupo</label>
         <select id="playGroup" value={form.group} onchange={e => { form.group = e.currentTarget.value; selectGroupMembers(); }}>

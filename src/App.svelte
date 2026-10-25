@@ -15,6 +15,7 @@
   import Recommend from './sections/Recommend.svelte';
   import Wishlist from './sections/Wishlist.svelte';
   import { handleBackButton, hideSplash } from './platform/native';
+  import { enter } from './motion';
   import { app, type Tab } from './stores/app.svelte';
 
   // The play form opens from several screens (catalog sheet, plays, group cards), so it lives here.
@@ -51,6 +52,8 @@
   <Header {navigate} />
   <Nav {navigate} />
   <main>
+    {#key app.tab + (app.personView ?? '')}
+    <div use:enter>
     {#if app.tab === 'catalog'}
       <Catalog {navigate} onplay={game => (playDialog = { open: true, game })} />
     {:else if app.tab === 'places'}
@@ -68,6 +71,8 @@
     {:else if app.tab === 'backup' && app.isAdmin}
       <Backup />
     {/if}
+    </div>
+    {/key}
   </main>
   <div class="footer">Un baúl para todos tus buenos planes.</div>
 </div>

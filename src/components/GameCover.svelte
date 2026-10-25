@@ -4,6 +4,7 @@
   import { averageRating } from '../domain/stats';
   import { formatDecimal, nameKey } from '../domain/text';
   import type { Game } from '../domain/types';
+  import { rememberOrigin } from '../motion';
   import { app } from '../stores/app.svelte';
 
   let { game, onopen }: { game: Game; onopen: (game: Game) => void } = $props();
@@ -13,7 +14,7 @@
   const rating = $derived(averageRating(app.stats.games.get(nameKey(game.name))));
 </script>
 
-<button type="button" class="cover pattern-{art.pattern}" style:--c1={art.from} style:--c2={art.to} onclick={() => onopen(game)}>
+<button type="button" class="cover pattern-{art.pattern}" style:--c1={art.from} style:--c2={art.to} onclick={event => { rememberOrigin(event.currentTarget); onopen(game); }}>
   {#if entry}<img class="cover-art" src={coverUrl(entry)} alt="" loading="lazy" />{/if}
   <span class="cover-meta">
     <span>👥 {game.players || '?'}</span>

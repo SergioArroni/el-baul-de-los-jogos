@@ -144,3 +144,12 @@ test('a game can be in several places at once', async ({ page }) => {
   await page.getByLabel('Filtrar lugar').selectOption('Casa Lu');
   await expect(covers(page).filter({ hasText: 'Carcassonne' })).toHaveCount(1);
 });
+
+test('the dice picks a random game that fits, without repeating', async ({ page }) => {
+  await page.getByRole('navigation').getByRole('button', { name: /Qué jugamos/ }).click();
+  await page.getByLabel('¿Dónde estáis?').selectOption('Casa Sergio');
+  await page.getByRole('button', { name: '🎲 Tirar el dado' }).click();
+  const first = await page.locator('.random-pick .cover-title').innerText();
+  await page.getByRole('button', { name: '🎲 Otro' }).click();
+  await expect(page.locator('.random-pick .cover-title')).not.toHaveText(first);
+});
