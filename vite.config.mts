@@ -31,6 +31,7 @@ export default defineConfig({
         deleteAccount: resolve(import.meta.dirname, 'borrar-cuenta.html'),
         landing: resolve(import.meta.dirname, 'inicio.html'),
         consent: resolve(import.meta.dirname, 'oauth-consent.html'),
+        privacy: resolve(import.meta.dirname, 'privacidad.html'),
       },
     },
   },
