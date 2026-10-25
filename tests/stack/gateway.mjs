@@ -11,6 +11,20 @@ import { anonKey, REST_PORT, sign, sql } from './stack.mjs';
 
 const require = createRequire(import.meta.url);
 const { deleteAccount, refusal } = require('../../api/_account.js');
+const { catalogGame, searchCatalog, toGameDraft } = await import('../../catalog/bgg.ts');
+
+// The catalog with a fake BGG (the fixtures) and an in-memory cache.
+const fixture = name => readFileSync(new URL(`../fixtures/${name}`, import.meta.url), 'utf8');
+const catalogStore = new Map();
+const catalog = {
+  token: 'test',
+  fetch: async url => new Response(fixture(url.includes('/search') ? 'bgg-search.xml' : 'bgg-thing.xml')),
+  cache: {
+    search: async query => [...catalogStore.values()].filter(game => game.name.toLowerCase().includes(query.toLowerCase())),
+    get: async id => catalogStore.get(id) ?? null,
+    save: async games => games.forEach(game => catalogStore.set(game.bggId, game)),
+  },
+};
 
 const PORT = 8790;
 const DIST = fileURLToPath(new URL('../../dist/', import.meta.url));
@@ -59,6 +73,15 @@ createServer(async (req, res) => {
     return json(res, 200, claims ? { id: claims.sub, email: claims.email } : {});
   }
   if (url.pathname.startsWith('/storage/v1/')) return json(res, 400, { error: 'Storage is not available in tests' });
+  if (url.pathname === '/api/catalog') {
+    if (!claimsOf(req.headers.authorization)?.sub) return json(res, 401, { error: 'Inicia sesión para continuar.' });
+    const id = Number(url.searchParams.get('id'));
+    if (id > 0) {
+      const game = await catalogGame(id, catalog);
+      return game ? json(res, 200, { game: toGameDraft(game) }) : json(res, 404, { error: 'No se ha encontrado ese juego.' });
+    }
+    return json(res, 200, { hits: await searchCatalog(url.searchParams.get('q') ?? '', catalog) });
+  }
   if (url.pathname === '/api/delete-account') {
     // Runs the real api/_account.js steps with full database access (like the secret key).
     // Storage and the Auth admin API don't exist here: no photo to remove, and the user

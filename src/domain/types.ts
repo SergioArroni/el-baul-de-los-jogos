@@ -10,6 +10,8 @@ export interface Game {
   duration: number | null;
   /** Places with a copy of the game: it can be in several houses. */
   locations: string[];
+  /** BoardGameGeek id, when it was filled in from the catalog. */
+  bggId?: number;
   notes: string;
 }
 

@@ -173,3 +173,11 @@ Cuando una decisión cambie, no se borra: se marca como **Sustituida** y se aña
 - **Decisión:** filtrado colaborativo por vecinos en una función SQL, `similar_taste_games()` (`sql/similar-taste.sql`): busca personas que hayan puntuado al menos 2 juegos como tú (cercanía = 1 − diferencia media / 9, mínimo 0,6) y estima tu nota de los juegos que no has puntuado como tu media más cuánto por encima de su propia media los ponen ellos. Solo devuelve juegos respaldados por 3 personas parecidas o más, sin decir quiénes. «Qué jugamos» lo usa para subir los juegos de tu baúl con estimación de 7 o más (con el motivo «A gente con tus gustos le encanta») y bajar los de 4 o menos, y enseña «Fuera de tu baúl» con los que no tienes.
 - **Alternativas:** factorización de matrices o modelos entrenados (más precisos con muchos datos, desproporcionados para un grupo de amigos); hacerlo en el navegador (habría que mandar las notas de todos: rompería la privacidad).
 - **Consecuencias:** funciona en cuanto haya varias personas con notas; con pocos usuarios casi no devolverá nada. Usa, de forma anónima, notas de cuentas con estadísticas privadas, como el ranking global.
+
+## 22. Catálogo de juegos con BoardGameGeek y caché propia
+**Estado:** Aceptada, en `dev`. Falta el token de BGG.
+
+- **Contexto:** al añadir un juego había que escribir a mano jugadores, duración, dureza y estilos.
+- **Decisión:** la función `api/catalog.ts` consulta la XML API v2 de BGG con un token que solo vive en el servidor (`BGG_TOKEN`) y guarda cada juego consultado en `catalog_games` (`sql/catalog.sql`), así BGG se consulta una vez por juego y el catálogo crece con el uso. La lógica está en `catalog/bgg.ts` (lectura del XML con fast-xml-parser, paso a nuestro formato y estilos, caché), probada con respuestas de ejemplo de BGG. Solo la usan personas con sesión. Las sugerencias salen en «Añadir juego» y en «Por comprar», con el crédito a BGG.
+- **Alternativas:** Wikidata (libre, pero pocos juegos y casi sin nombres en español ni dureza); llamar a BGG desde el navegador (expondría el token y no habría caché); descargar todo BGG de golpe (sus condiciones piden pocas peticiones).
+- **Consecuencias:** sin token solo hay lo ya guardado. Uso no comercial: si algún día se monetiza, hace falta la licencia comercial de BGG. Pasos en `docs/BGG.md`.

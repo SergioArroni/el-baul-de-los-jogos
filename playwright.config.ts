@@ -36,7 +36,8 @@ export default defineConfig({
     },
     {
       // Fake Supabase/Vercel in front of the Docker backend (only used by the integration project).
-      command: 'node tests/stack/gateway.mjs',
+      // tsx: the gateway runs the real catalog module (TypeScript) against BGG fixtures.
+      command: 'node --import tsx tests/stack/gateway.mjs',
       url: 'http://localhost:8790/index.html',
       reuseExistingServer: !process.env.CI,
     },

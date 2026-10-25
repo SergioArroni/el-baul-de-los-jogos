@@ -1,5 +1,7 @@
 <script lang="ts">
+  import CatalogSuggest from '../components/CatalogSuggest.svelte';
   import Modal from '../components/Modal.svelte';
+  import type { GameDraft } from '../data/catalog';
   import { nameKey } from '../domain/text';
   import type { Game } from '../domain/types';
   import { untrack } from 'svelte';
@@ -12,6 +14,14 @@
   /** The user's places, plus any the game already had that no longer exists (so it can be unticked). */
   const placeNames = $derived([...new Set([...app.places.map(place => place.name), ...(game?.locations ?? [])])]);
   let status = $state('');
+  let bggId = $state<number | undefined>();
+
+  /** A game picked from the catalog fills the form; anything can still be edited. */
+  function fill(draft: GameDraft) {
+    bggId = draft.bggId;
+    form = { ...form, name: draft.name, players: draft.players || form.players, types: draft.types.join(', ') || form.types,
+      weight: draft.weight ? String(draft.weight) : form.weight, duration: draft.duration ? String(draft.duration) : form.duration };
+  }
 
   $effect(() => {
     if (open) untrack(reset);
@@ -19,6 +29,7 @@
 
   function reset() {
     status = '';
+    bggId = game?.bggId;
     form = game
       ? { name: game.name, players: game.players ?? '', types: game.types.join(', '), weight: String(game.weight ?? ''),
           duration: String(game.duration ?? ''), locations: [...game.locations], notes: game.notes ?? '' }
@@ -36,6 +47,7 @@
       duration: Number(form.duration) || null,
       locations: placeNames.filter(name => form.locations.includes(name)),
       notes: form.notes.trim(),
+      ...(bggId ? { bggId } : {}),
     };
     if (app.games.some(g => g.id !== saved.id && nameKey(g.name) === nameKey(saved.name))) {
       status = 'Ya hay un juego con ese nombre en tu colección.';
@@ -49,7 +61,7 @@
 <Modal {open} title={game ? 'Editar juego' : 'Añadir juego'} {onclose}>
   <form onsubmit={submit}>
     <div class="formgrid">
-      <div class="field"><label for="gName">Nombre *</label><input id="gName" required maxlength="100" bind:value={form.name} /></div>
+      <div class="field"><label for="gName">Nombre *</label><input id="gName" required maxlength="100" autocomplete="off" bind:value={form.name} /><CatalogSuggest query={form.name} onpick={fill} /></div>
       <div class="field"><label for="gPlayers">Jugadores (mín.–máx.)</label><input id="gPlayers" placeholder="Ej. 2–6" bind:value={form.players} /></div>
       <div class="field"><label for="gTypes">Estilos (separados por comas)</label><input id="gTypes" placeholder="Fiesta, Cartas, Humor" bind:value={form.types} /></div>
       <div class="field">

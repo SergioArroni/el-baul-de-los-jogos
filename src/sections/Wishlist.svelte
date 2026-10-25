@@ -1,5 +1,6 @@
 <script lang="ts">
   import MeepleToken from '../components/MeepleToken.svelte';
+  import CatalogSuggest from '../components/CatalogSuggest.svelte';
   import Modal from '../components/Modal.svelte';
   import { deleteProposal, proposeGame, setMeeple } from '../data/wishlist';
   import { MEEPLES, meeplesLeft } from '../domain/wishlist';
@@ -119,7 +120,8 @@
 <Modal {open} title="Proponer un juego" onclose={() => (open = false)}>
   <form onsubmit={submit}>
     <div class="formgrid">
-      <div class="field full"><label for="wishTitle">Nombre del juego *</label><input id="wishTitle" required maxlength="120" bind:value={form.title} /></div>
+      <div class="field full"><label for="wishTitle">Nombre del juego *</label><input id="wishTitle" required maxlength="120" autocomplete="off" bind:value={form.title} />
+        <CatalogSuggest query={form.title} onpick={draft => (form = { ...form, title: draft.name, players: draft.players || form.players, duration: draft.duration ? `${draft.duration} min` : form.duration, url: form.url || `https://boardgamegeek.com/boardgame/${draft.bggId}` })} /></div>
       <div class="field full"><label for="wishUrl">Enlace a la tienda o ficha</label><input id="wishUrl" type="url" placeholder="https://…" bind:value={form.url} /></div>
       <div class="field full"><label for="wishHype">Ganas de jogo *</label><select id="wishHype" bind:value={form.hype}><option value="" disabled>Elige…</option>{#each Object.entries(HYPE) as [value, label] (value)}<option {value}>{label}</option>{/each}</select></div>
       <div class="field"><label for="wishPrice">Precio aproximado (€)</label><input id="wishPrice" type="number" min="0" step="0.01" placeholder="Ej. 39,95" bind:value={form.price} /></div>

@@ -15,7 +15,7 @@ export const USERS = {
   c: { id: 'cccccccc-0000-0000-0000-000000000003', email: 'c@x.com', nickname: 'usuario_c' },
   d: { id: 'dddddddd-0000-0000-0000-000000000004', email: 'd@x.com', nickname: 'usuario_d' },
 };
-const MIGRATIONS = ['schema.sql', 'unique-game-names.sql', 'user-features.sql', 'profile-appearance.sql', 'community-plays.sql', 'wishlist-hype.sql', 'profiles-privacy.sql', 'wishlist-meeples.sql', 'plays-duration.sql', 'ranking.sql', 'google-login.sql', 'similar-taste.sql'];
+const MIGRATIONS = ['schema.sql', 'unique-game-names.sql', 'user-features.sql', 'profile-appearance.sql', 'community-plays.sql', 'wishlist-hype.sql', 'profiles-privacy.sql', 'wishlist-meeples.sql', 'plays-duration.sql', 'ranking.sql', 'google-login.sql', 'similar-taste.sql', 'catalog.sql'];
 
 function docker(args, input) {
   try {
@@ -70,7 +70,7 @@ export async function up() {
 
   for (const file of MIGRATIONS) sql(readFileSync(new URL(`../../sql/${file}`, import.meta.url), 'utf8'));
   // Second run of the newest migration: it must be safe to run twice.
-  sql(readFileSync(new URL('../../sql/similar-taste.sql', import.meta.url), 'utf8'));
+  sql(readFileSync(new URL('../../sql/catalog.sql', import.meta.url), 'utf8'));
 
   addUsers();
 
