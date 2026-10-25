@@ -17,7 +17,21 @@ export interface RecommendOptions {
   taste?: Taste;
   /** Today's date (ISO), to notice games you haven't played in a while. */
   today?: string;
+  /** What people with tastes like yours think of each game, by name key (collaborative filtering). */
+  crowd?: Map<string, CrowdPick>;
 }
+
+/** A game as rated by people with tastes like yours: an estimate of your rating. */
+export interface CrowdPick {
+  name: string;
+  /** Estimated rating for you, 1–10. */
+  predicted: number;
+  /** How many similar people back it (at least 3). */
+  neighbours: number;
+}
+
+/** Above this estimate, "people like you love it" is a reason to suggest a game. */
+export const CROWD_LOVES = 7;
 
 export interface Recommendation {
   game: Game;
@@ -30,7 +44,7 @@ export interface Recommendation {
 
 /** Scores every game for the plan and returns the best eight. */
 export function recommend(games: Game[], options: RecommendOptions): Recommendation[] {
-  const { players, group, mood, weight, duration, place, groupGames = new Map(), taste, today } = options;
+  const { players, group, mood, weight, duration, place, groupGames = new Map(), taste, today, crowd } = options;
   const we = group ? 'Os' : 'Te';
   const likes = group ? (group.likes ?? '').toLowerCase().split(',').map(s => s.trim()).filter(Boolean) : [];
   return games
@@ -49,6 +63,14 @@ export function recommend(games: Game[], options: RecommendOptions): Recommendat
       if (likes.length && game.types.some(type => likes.includes(type.toLowerCase()))) score += 3;
       const reasons: string[] = [];
       let weightReason = '';
+      // Collaborative filtering: what people with your taste think of it.
+      const pick = crowd?.get(nameKey(game.name));
+      if (pick) {
+        if (pick.predicted >= CROWD_LOVES) {
+          score += (pick.predicted - 6.5) * 1.5;
+          reasons.push(`A gente con tus gustos le encanta (★ ${formatDecimal(pick.predicted)})`);
+        } else if (pick.predicted <= 4) score -= 2;
+      }
       if (taste) {
         const key = nameKey(game.name);
         // Styles you rate well pull a game up; the best matching style explains it.

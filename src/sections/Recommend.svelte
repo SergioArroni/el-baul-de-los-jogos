@@ -1,9 +1,11 @@
 <script lang="ts">
+  import { coverUrl, findInLibrary } from '../content/library';
+  import { loadSimilarTaste } from '../data/crowd';
   import { groupMembers, playGroupKey } from '../domain/groups';
-  import { recommend, type Recommendation } from '../domain/recommend';
+  import { CROWD_LOVES, recommend, type CrowdPick, type Recommendation } from '../domain/recommend';
   import { playStats } from '../domain/stats';
   import { learnTaste } from '../domain/taste';
-  import { localToday } from '../domain/text';
+  import { formatDecimal, localToday, nameKey } from '../domain/text';
   import type { Group } from '../domain/types';
   import { app } from '../stores/app.svelte';
   import RandomGame from './RandomGame.svelte';
@@ -28,13 +30,21 @@
     if (count) players = count;
   }
 
-  function find() {
+  // Loaded once: what people with tastes like yours rated well (anonymous, from the server).
+  let crowd: Promise<Map<string, CrowdPick> | null> | null = null;
+  let outside = $state<CrowdPick[]>([]);
+
+  async function find() {
+    if (app.user) crowd ??= loadSimilarTaste().catch(() => null);
+    const crowdPicks = (await crowd) ?? undefined;
+    const owned = new Set(app.games.map(game => nameKey(game.name)));
+    outside = crowdPicks ? [...crowdPicks.entries()].filter(([key, pick]) => !owned.has(key) && pick.predicted >= CROWD_LOVES).map(([, pick]) => pick).slice(0, 5) : [];
     const groupPlays = group ? app.plays.filter(p => playGroupKey(p) === app.groupKey(group)) : app.plays;
     const groupGames = group ? playStats(groupPlays).games : undefined;
     // Whose ratings teach the taste: the group's members with an account, or just you.
     const people = new Set([app.user?.id, ...members.map(member => member.userId)].filter((id): id is string => !!id));
     const taste = app.plays.length ? learnTaste(groupPlays, app.games, people.size ? people : null) : undefined;
-    results = { list: recommend(app.games, { players, group, groupGames, mood, weight, duration, place, taste, today: localToday() }), players, group };
+    results = { list: recommend(app.games, { players, group, groupGames, mood, weight, duration, place, taste, today: localToday(), crowd: crowdPicks }), players, group };
   }
 </script>
 
@@ -105,6 +115,22 @@
       </div>
     {:else}
       <div class="empty">No he encontrado una combinación clara. Prueba con otro número o plan.</div>
+    {/if}
+    {#if outside.length}
+      <div class="reco outside">
+        <h3>Fuera de tu baúl</h3>
+        <p class="details">Juegos que no tienes y que gustan mucho a gente con tus gustos. Podéis proponerlos en «Por comprar».</p>
+        <ul class="outside-list">
+          {#each outside as pick (pick.name)}
+            {@const entry = findInLibrary(pick.name)}
+            <li>
+              {#if entry}<img src={coverUrl(entry)} alt="" loading="lazy" />{:else}<span class="outside-dice" aria-hidden="true">🎲</span>{/if}
+              <strong>{pick.name}</strong>
+              <span>★ {formatDecimal(pick.predicted)} para ti · {pick.neighbours} personas parecidas</span>
+            </li>
+          {/each}
+        </ul>
+      </div>
     {/if}
   {/if}
 </section>

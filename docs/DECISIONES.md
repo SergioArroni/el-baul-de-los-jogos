@@ -165,3 +165,11 @@ Cuando una decisión cambie, no se borra: se marca como **Sustituida** y se aña
 - **Decisión:** el workflow de Android genera además un AAB firmado con la misma clave (jarsigner); de momento no bloquea la APK si falla. El login muestra «Entrar con Google» solo si Supabase tiene Google activado (lo consulta en `/auth/v1/settings`) y nunca dentro de la APK. `sql/google-login.sql` da un apodo automático a las cuentas que llegan sin él. Pasos para activarlo en `docs/GOOGLE-LOGIN.md`.
 - **Alternativas:** plugin nativo de Google para la APK (más trabajo y otra configuración en Google Cloud); pedir el apodo en una pantalla aparte tras el primer acceso con Google (más fricción).
 - **Consecuencias:** en la APK se sigue entrando con correo o apodo. Cuando el AAB salga bien en GitHub, se quita el `continue-on-error`.
+
+## 21. Recomendación colaborativa en el servidor, anónima
+**Estado:** Aceptada, en `dev`. Amplía la 18.
+
+- **Contexto:** la recomendación basada en contenido solo mira estilos y dureza; no sabe que «a gente como tú le encantó Spirit Island».
+- **Decisión:** filtrado colaborativo por vecinos en una función SQL, `similar_taste_games()` (`sql/similar-taste.sql`): busca personas que hayan puntuado al menos 2 juegos como tú (cercanía = 1 − diferencia media / 9, mínimo 0,6) y estima tu nota de los juegos que no has puntuado como tu media más cuánto por encima de su propia media los ponen ellos. Solo devuelve juegos respaldados por 3 personas parecidas o más, sin decir quiénes. «Qué jugamos» lo usa para subir los juegos de tu baúl con estimación de 7 o más (con el motivo «A gente con tus gustos le encanta») y bajar los de 4 o menos, y enseña «Fuera de tu baúl» con los que no tienes.
+- **Alternativas:** factorización de matrices o modelos entrenados (más precisos con muchos datos, desproporcionados para un grupo de amigos); hacerlo en el navegador (habría que mandar las notas de todos: rompería la privacidad).
+- **Consecuencias:** funciona en cuanto haya varias personas con notas; con pocos usuarios casi no devolverá nada. Usa, de forma anónima, notas de cuentas con estadísticas privadas, como el ranking global.

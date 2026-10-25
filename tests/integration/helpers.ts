@@ -2,7 +2,7 @@ import { expect, type Browser, type Page } from '@playwright/test';
 // @ts-expect-error plain JS helper shared with the Node scripts
 import { sign, USERS } from '../stack/stack.mjs';
 
-export type UserKey = 'a' | 'b' | 'c';
+export type UserKey = 'a' | 'b' | 'c' | 'd';
 export const users = USERS as Record<UserKey, { id: string; email: string; nickname: string }>;
 
 /** Opens the app already signed in as one of the test accounts (a session in localStorage, like after login). */

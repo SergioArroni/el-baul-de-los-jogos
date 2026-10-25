@@ -259,3 +259,18 @@ describe('learning your taste', () => {
     expect(monthsBetween('2026-01-31', '2026-02-28')).toBe(0);
   });
 });
+
+describe('collaborative filtering', () => {
+  const collection = [game({ id: '1', name: 'Spirit Island' }), game({ id: '2', name: 'Uno' }), game({ id: '3', name: 'Azul' })];
+  const crowd = new Map([
+    ['spirit island', { name: 'Spirit Island', predicted: 8.4, neighbours: 4 }],
+    ['uno', { name: 'Uno', predicted: 2.5, neighbours: 3 }],
+  ]);
+
+  it('pushes up what people with your taste love, and says so first', () => {
+    const result = recommend(collection, { players: 3, mood: '', weight: 0, duration: 0, place: '', crowd });
+    expect(result[0].game.name).toBe('Spirit Island');
+    expect(result[0].reasons[0]).toBe('A gente con tus gustos le encanta (★ 8,4)');
+    expect(result.at(-1)?.game.name).toBe('Uno');
+  });
+});
