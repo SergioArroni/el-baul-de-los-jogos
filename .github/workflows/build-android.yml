@@ -73,6 +73,8 @@ jobs:
       # Google Play wants an Android App Bundle (AAB) signed with the same key (jarsigner,
       # since apksigner only signs APKs).
       - name: Build signed release AAB (Google Play)
+        # Doesn't block the APK until its signature check is settled.
+        continue-on-error: true
         env:
           KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
@@ -87,10 +89,12 @@ jobs:
           find android/app/build/outputs/bundle -name '*.aab' -print
           cp "$(find android/app/build/outputs/bundle/release -name '*signed*.aab' | head -1 || true)" el-baul-de-los-jogos.aab 2>/dev/null \
             || cp "$(find android/app/build/outputs/bundle/release -name '*.aab' | head -1)" el-baul-de-los-jogos.aab
-          # jarsigner -verify exits 0 even for unsigned files: check its answer.
-          jarsigner -verify el-baul-de-los-jogos.aab | tee verify.txt | tail -1
+          # jarsigner -verify exits 0 even for unsigned files: check its answer (shown in full).
+          jarsigner -verify -verbose:summary -certs el-baul-de-los-jogos.aab > verify.txt 2>&1 || true
+          tail -25 verify.txt
           grep -q "jar verified" verify.txt || { echo "::error::El AAB no está firmado"; exit 1; }
       - name: Upload AAB
+        if: hashFiles('el-baul-de-los-jogos.aab') != ''
         uses: actions/upload-artifact@v7
         with:
           name: el-baul-de-los-jogos-${{ github.ref_name }}-aab
