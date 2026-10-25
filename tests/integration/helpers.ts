@@ -19,7 +19,12 @@ export async function openAs(browser: Browser, who: UserKey): Promise<Page> {
     expires_at: Math.floor(Date.now() / 1000) + 86400,
     user: { id: user.id, email: user.email, aud: 'authenticated', role: 'authenticated', app_metadata: {}, user_metadata: {} },
   };
-  await context.addInitScript(value => localStorage.setItem('sb-localhost-auth-token', value), JSON.stringify(session));
+  // Only on the first page: after a sign-out (or deleting the account) the session must stay gone.
+  await context.addInitScript(value => {
+    if (sessionStorage.getItem('test-session-seeded')) return;
+    localStorage.setItem('sb-localhost-auth-token', value);
+    sessionStorage.setItem('test-session-seeded', '1');
+  }, JSON.stringify(session));
   await page.goto('/');
   await expect(page.locator('.syncstatus')).toHaveText('Sincronizado', { timeout: 15_000 });
   return page;
