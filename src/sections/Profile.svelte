@@ -27,8 +27,11 @@
 
   let privacy = $state<Privacy>({ collection: 'friends', stats: 'friends' });
   let privacyStatus = $state('');
+  // The profile reloads in the background when this screen opens: once the person
+  // has touched a selector, that reload must not put the old values back.
+  let privacyTouched = false;
   $effect(() => {
-    if (app.privacy) privacy = { ...app.privacy };
+    if (app.privacy && !privacyTouched) privacy = { ...app.privacy };
   });
 
   let deleting = $state(false);
@@ -66,6 +69,7 @@
     try {
       await updatePrivacy(app.user!.id, privacy);
       app.privacy = { ...privacy };
+      privacyTouched = false;
       privacyStatus = 'Privacidad guardada.';
     } catch (error) {
       privacyStatus = (error as Error).message;
@@ -171,9 +175,9 @@
       <form class="card profile-card" onsubmit={savePrivacy}>
         <div class="formgrid">
           <div class="field"><label for="privacyCollection">Mi colección</label>
-            <select id="privacyCollection" bind:value={privacy.collection}>{#each Object.entries(VISIBILITY_LABELS) as [value, label] (value)}<option {value}>{label}</option>{/each}</select></div>
+            <select id="privacyCollection" bind:value={privacy.collection} onchange={() => (privacyTouched = true)}>{#each Object.entries(VISIBILITY_LABELS) as [value, label] (value)}<option {value}>{label}</option>{/each}</select></div>
           <div class="field"><label for="privacyStats">Mis estadísticas</label>
-            <select id="privacyStats" bind:value={privacy.stats}>{#each Object.entries(VISIBILITY_LABELS) as [value, label] (value)}<option {value}>{label}</option>{/each}</select></div>
+            <select id="privacyStats" bind:value={privacy.stats} onchange={() => (privacyTouched = true)}>{#each Object.entries(VISIBILITY_LABELS) as [value, label] (value)}<option {value}>{label}</option>{/each}</select></div>
         </div>
         <p class="details">«Pública»: cualquiera con cuenta. «Solo mis amigos»: las personas que tienes añadidas en Comunidad con su cuenta vinculada. «Privada»: solo tú. Quien vea tu colección verá también las notas de tus juegos.</p>
         <p class="notice" role="status">{privacyStatus}</p>
