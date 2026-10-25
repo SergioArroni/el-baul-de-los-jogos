@@ -4,6 +4,7 @@ import { buildShelves, filterGames, noFilters, topTypes } from '../../src/domain
 import { groupKey, groupMembers, groupWithMembers, playGroupKey, splitGroupKey } from '../../src/domain/groups';
 import { maxPlayers, playerRange, supports } from '../../src/domain/players';
 import { recommend } from '../../src/domain/recommend';
+import { signedOutPage } from '../../src/domain/routes';
 import { needsPlaceMigration, normalizeGamePlace, seedGames, withDefaultPlaces } from '../../src/domain/seed';
 import { playStats } from '../../src/domain/stats';
 import { diffRows, snapshotOf } from '../../src/domain/sync';
@@ -196,5 +197,13 @@ describe('seed', () => {
     expect(seedGames()).toHaveLength(42);
     expect(withDefaultPlaces([{ id: 'x', name: 'casa lu' }]).map(p => p.name)).toHaveLength(5);
     expect(withDefaultPlaces([])).toHaveLength(5);
+  });
+});
+
+describe('signed-out visitors', () => {
+  it('see the landing on the web, and the login in the APK or from an email link', () => {
+    expect(signedOutPage(false, '')).toBe('/inicio');
+    expect(signedOutPage(true, '')).toBe('login.html');
+    expect(signedOutPage(false, '#access_token=x&type=recovery')).toBe('login.html#access_token=x&type=recovery');
   });
 });

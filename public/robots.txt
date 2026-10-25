@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /inicio
+Disallow: /admin.html
+Disallow: /api/
+
+Sitemap: https://el-baul-de-los-jogos.vercel.app/sitemap.xml

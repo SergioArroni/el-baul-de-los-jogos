@@ -7,7 +7,9 @@ import { loadPlays } from '../data/plays';
 import { loadProfile, type Privacy } from '../data/profile';
 import { loadFriendRequests, loadPeople, lookupAccounts, syncFriendLinks } from '../data/social';
 import { loadWishlist } from '../data/wishlist';
+import { isNative } from '../platform/native';
 import { groupKey } from '../domain/groups';
+import { signedOutPage } from '../domain/routes';
 import { playStats } from '../domain/stats';
 import { nameKey } from '../domain/text';
 import type {
@@ -83,7 +85,7 @@ class AppStore {
     }
     if (error) throw error;
     if (!data.session) {
-      location.replace('login.html' + location.hash);
+      location.replace(signedOutPage(isNative, location.hash));
       return;
     }
     this.ready = true;

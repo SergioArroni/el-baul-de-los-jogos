@@ -15,6 +15,8 @@ const { deleteAccount, refusal } = require('../../api/_account.js');
 const PORT = 8790;
 const DIST = fileURLToPath(new URL('../../dist/', import.meta.url));
 const REST = `http://localhost:${REST_PORT}`;
+// Same clean URLs as Vercel (/inicio, /privacidad).
+const REWRITES = JSON.parse(readFileSync(new URL('../../vercel.json', import.meta.url), 'utf8')).rewrites ?? [];
 const TYPES = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'application/javascript' };
 const claimsOf = header => {
   try {
@@ -95,7 +97,8 @@ createServer(async (req, res) => {
     });
   }
 
-  const file = normalize(join(DIST, url.pathname === '/' ? 'index.html' : url.pathname));
+  const page = REWRITES.find(rule => rule.source === url.pathname)?.destination ?? url.pathname;
+  const file = normalize(join(DIST, page === '/' ? 'index.html' : page));
   if (file.startsWith(normalize(DIST)) && existsSync(file) && statSync(file).isFile()) {
     res.writeHead(200, { 'content-type': TYPES[extname(file)] ?? 'application/octet-stream' });
     return res.end(readFileSync(file));

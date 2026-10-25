@@ -1,0 +1,81 @@
+/* One source for colours, shadows, shapes and fonts, shared by every page: the app,
+   login, admin, the landing (/inicio) and the legal pages. Plain CSS in public/ so it
+   loads before anything paints, on the web and inside the APK. */
+:root {
+  color-scheme: light;
+  --bg: #f5f4ed;
+  --paper: #fffefa;
+  --surface: #eeeee6;
+  --ink: #1d2923;
+  --muted: #68756c;
+  --line: #e2e4da;
+  --green: #245b45;
+  --green-hover: #194a36;
+  --mint: #e4efe7;
+  --green2: var(--mint);
+  --orange: #c96f3d;
+  --gold: #e9b949;
+  --field: #fffefa;
+  --nav-bg: #fffefa;
+  --nav-active: #e4efe7;
+  /* The game table: felt green for the landing and login stages. */
+  --table: #1c382b;
+  --table-ink: #f6f4e9;
+  --shadow: 0 12px 32px #18251d0c;
+  --shadow-lg: 0 24px 70px #18251d14;
+  --card-shadow: 0 18px 34px -16px #10201866;
+  --radius: 16px;
+  --radius-lg: 25px;
+  --font-body: "DM Sans", system-ui, sans-serif;
+  --font-display: Fraunces, Georgia, serif;
+  --ease-out: cubic-bezier(.2, .8, .3, 1);
+  --ease-bounce: cubic-bezier(.2, .8, .3, 1.35);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #111914;
+    --paper: #19231d;
+    --surface: #222f27;
+    --ink: #f1f3ed;
+    --muted: #a9b4aa;
+    --line: #2d3a32;
+    --green: #85b99a;
+    --green-hover: #9ac9aa;
+    --mint: #243a2d;
+    --orange: #e99462;
+    --field: #19231d;
+    --nav-bg: #19231d;
+    --nav-active: #253c2e;
+    --table: #10241a;
+    --shadow: 0 14px 32px #0003;
+    --shadow-lg: 0 24px 70px #0004;
+    --card-shadow: 0 18px 34px -16px #000a;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #111914;
+  --paper: #19231d;
+  --surface: #222f27;
+  --ink: #f1f3ed;
+  --muted: #a9b4aa;
+  --line: #2d3a32;
+  --green: #85b99a;
+  --green-hover: #9ac9aa;
+  --mint: #243a2d;
+  --orange: #e99462;
+  --field: #19231d;
+  --nav-bg: #19231d;
+  --nav-active: #253c2e;
+  --table: #10241a;
+  --shadow: 0 14px 32px #0003;
+  --shadow-lg: 0 24px 70px #0004;
+  --card-shadow: 0 18px 34px -16px #000a;
+}
+/* Paper grain for surfaces that want the "mesa de juego" texture. */
+.grain { position: relative; isolation: isolate; }
+.grain::after {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: .35; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .55 -.25'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
