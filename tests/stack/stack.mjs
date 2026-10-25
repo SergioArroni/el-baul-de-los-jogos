@@ -71,9 +71,7 @@ export async function up() {
   // Second run of the newest migration: it must be safe to run twice.
   sql(readFileSync(new URL('../../sql/profiles-privacy.sql', import.meta.url), 'utf8'));
 
-  const values = Object.values(USERS)
-    .map(u => `('${u.id}','${u.email}','{"nickname":"${u.nickname}"}')`).join(',');
-  sql(`insert into auth.users(id, email, raw_user_meta_data) values ${values};`, { admin: true });
+  addUsers();
 
   docker(['run', '-d', '--name', REST, '-p', `${REST_PORT}:3000`, '--add-host=host.docker.internal:host-gateway',
     '-e', `PGRST_DB_URI=postgres://authenticator:postgres@host.docker.internal:${DB_PORT}/postgres`,
@@ -93,7 +91,15 @@ export function down() {
 }
 
 /** Empties the app tables between tests (accounts and profiles stay). */
+/** Creates the test accounts that don't exist (a test may delete one). */
+function addUsers() {
+  const values = Object.values(USERS)
+    .map(u => `('${u.id}','${u.email}','{"nickname":"${u.nickname}"}')`).join(',');
+  sql(`insert into auth.users(id, email, raw_user_meta_data) values ${values} on conflict (id) do nothing;`, { admin: true });
+}
+
 export function resetData() {
+  addUsers();
   sql('truncate public.plays, public.friend_links, public.group_shares, public.groups, public.games, public.places, public.friends, public.wishlist_games cascade;', { admin: true });
   sql("update public.profiles set collection_visibility = 'friends', stats_visibility = 'friends';", { admin: true });
 }

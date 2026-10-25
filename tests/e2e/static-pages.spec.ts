@@ -24,3 +24,9 @@ test('admin page loads its scripts with every outside server blocked', async ({ 
   expect(await page.evaluate(() => typeof (window as { supabase?: { createClient?: unknown } }).supabase?.createClient)).toBe('function');
   expect(errors).toEqual([]);
 });
+
+test('the public page explains how to delete an account', async ({ page }) => {
+  await page.goto('/borrar-cuenta.html');
+  await expect(page.getByRole('heading', { name: 'Borrar tu cuenta' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Entrar para borrar mi cuenta' })).toHaveAttribute('href', '/login.html');
+});

@@ -17,6 +17,15 @@ Al terminarla, se borra de aquí.
 - **Reglas de 7 juegos** sin explicación fiable: Game Off, ¿Alguien ha probado este juego?,
   La Vacuna Española, El Cubilete, el juego de beber, Codex y Brink.
 
+## Publicar en Google Play (acordado el 2026-10-25; sin monetizar de momento)
+1. Pasar `dev` a `main` y ejecutar los SQL pendientes.
+2. Requisitos de Play: borrar la cuenta (hecho: botón en «Mi perfil» y `borrar-cuenta.html`),
+   página de política de privacidad, compilar en AAB además de APK y, opcional, entrar con Google.
+3. Crear la cuenta de desarrollador (25 $) y hacer la prueba cerrada: 12 testers durante 14 días.
+4. Publicar gratis para todos.
+5. Monetizar, más adelante y solo si hay usuarios: empezar por donaciones. Cobrar o poner anuncios
+   obliga a pasar Vercel a Pro, a pedir licencia comercial a BGG y a revisar lo fiscal.
+
 ## Ideas nuevas
 
 ### 1. Juego al azar por lugar

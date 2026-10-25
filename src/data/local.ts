@@ -40,6 +40,15 @@ export function saveLocal(collection: Collection): void {
   }
 }
 
+/** Forgets this browser's copy of the collection and profile (after deleting the account). */
+export function clearLocal(): void {
+  try {
+    for (const key of [...Object.values(KEYS), 'ludoteca_nickname', 'ludoteca_avatar']) localStorage.removeItem(key);
+  } catch {
+    /* storage blocked: nothing to forget */
+  }
+}
+
 export const localSetting = {
   get: (key: string): string => {
     try {

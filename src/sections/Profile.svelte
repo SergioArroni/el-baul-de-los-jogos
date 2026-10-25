@@ -1,7 +1,10 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
   import Avatar from '../components/Avatar.svelte';
-  import { localSetting } from '../data/local';
+  import Modal from '../components/Modal.svelte';
+  import { deleteMyAccount } from '../data/account';
+  import { supabase } from '../data/client';
+  import { clearLocal, localSetting } from '../data/local';
   import { toAvatarWebp, updateNickname, updatePrivacy, uploadAvatar, type Privacy } from '../data/profile';
   import { VISIBILITY_LABELS } from '../domain/profiles';
   import { isValidNickname } from '../domain/text';
@@ -27,6 +30,35 @@
   $effect(() => {
     if (app.privacy) privacy = { ...app.privacy };
   });
+
+  let deleting = $state(false);
+  let deleteConfirm = $state('');
+  let deleteStatus = $state('');
+  let deleteBusy = $state(false);
+  const deleteReady = $derived(!!app.nickname && deleteConfirm.trim().toLowerCase() === app.nickname.toLowerCase());
+
+  function startDelete() {
+    deleteConfirm = '';
+    deleteStatus = '';
+    deleting = true;
+  }
+
+  async function confirmDelete(event: SubmitEvent) {
+    event.preventDefault();
+    if (!deleteReady) return void (deleteStatus = 'Escribe tu apodo tal cual para confirmar.');
+    deleteBusy = true;
+    deleteStatus = 'Borrando tu cuenta…';
+    try {
+      await deleteMyAccount();
+      clearLocal();
+      // The account no longer exists on the server: only forget the session here.
+      await supabase?.auth.signOut({ scope: 'local' });
+      location.replace('login.html?deleted=1');
+    } catch (error) {
+      deleteStatus = (error as Error).message;
+      deleteBusy = false;
+    }
+  }
 
   async function savePrivacy(event: SubmitEvent) {
     event.preventDefault();
@@ -151,6 +183,13 @@
       <p class="notice">Para elegir la privacidad, primero hay que activar los perfiles en Supabase (sql/profiles-privacy.sql).</p>
     {/if}
   {/if}
+  {#if app.user}
+    <div class="sectionhead" style="margin-top:34px"><div><h2 style="font-size:1.35rem">Borrar mi cuenta</h2><p>Elimina tu cuenta y tus datos para siempre.</p></div></div>
+    <div class="card profile-card">
+      <p class="details">Se borran tu colección, grupos, lugares, amigos, propuestas de compra y votos, avisos, foto y perfil. Las partidas que registraste en grupos de otras personas se quedan para ellas, y en todas las partidas tu nombre pasa a ser «Cuenta borrada». No se puede deshacer.</p>
+      <button class="btn danger" type="button" style="margin-top:12px" onclick={startDelete}>Borrar mi cuenta</button>
+    </div>
+  {/if}
   <div class="sectionhead" style="margin-top:34px"><div><h2 style="font-size:1.35rem">Apariencia</h2><p>Elige un tema o sigue el que usa tu dispositivo.</p></div></div>
   <div class="theme-options theme-settings" role="group" aria-label="Elegir tema">
     {#each themes as [value, label] (value)}
@@ -158,3 +197,15 @@
     {/each}
   </div>
 </section>
+
+<Modal open={deleting} title="¿Borrar tu cuenta para siempre?" onclose={() => !deleteBusy && (deleting = false)}>
+  <form onsubmit={confirmDelete}>
+    <p class="details">Se borrarán tu cuenta y tus datos, y no se puede deshacer. Para confirmarlo, escribe tu apodo: <strong>{app.nickname}</strong>.</p>
+    <div class="field"><label for="deleteConfirm">Tu apodo</label><input id="deleteConfirm" autocomplete="off" bind:value={deleteConfirm} /></div>
+    <p class="notice" role="status">{deleteStatus}</p>
+    <div class="formactions">
+      <button type="button" class="btn ghost" disabled={deleteBusy} onclick={() => (deleting = false)}>Cancelar</button>
+      <button class="btn danger" type="submit" disabled={deleteBusy || !deleteReady}>Borrar para siempre</button>
+    </div>
+  </form>
+</Modal>

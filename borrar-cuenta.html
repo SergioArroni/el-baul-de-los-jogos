@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#f5f4ed">
+<title>Borrar tu cuenta · El Baul de los Jogos</title>
+<meta name="description" content="Cómo borrar tu cuenta de El Baúl de los Jogos y qué datos se eliminan.">
+<link rel="icon" type="image/png" sizes="32x32" href="/brand/favicon-32.png"><link rel="apple-touch-icon" href="/brand/apple-touch-icon.png">
+<script>const savedTheme=localStorage.getItem('el-baul-theme')||'system';if(savedTheme!=='system')document.documentElement.dataset.theme=savedTheme</script>
+<style>
+:root{color-scheme:light;--bg:#f5f4ed;--paper:#fffefa;--ink:#1d2923;--muted:#68756c;--line:#e2e4da;--green:#245b45;--green2:#dfece2}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#111914;--paper:#19231d;--ink:#f1f3ed;--muted:#a9b4aa;--line:#2d3a32;--green:#85b99a;--green2:#243a2d}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#111914;--paper:#19231d;--ink:#f1f3ed;--muted:#a9b4aa;--line:#2d3a32;--green:#85b99a;--green2:#243a2d}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 "DM Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+main{width:min(100% - 32px,720px);margin:0 auto;padding:48px 0 64px}
+h1{margin:0 0 8px;font:600 clamp(2rem,6vw,2.8rem)/1.1 Fraunces,Georgia,serif;letter-spacing:-.03em}
+h2{margin:36px 0 10px;font:600 1.3rem/1.25 Fraunces,Georgia,serif}
+.lead{margin:0;color:var(--muted);font-size:1.05rem}
+.card{margin-top:20px;padding:20px 22px;border:1px solid var(--line);border-radius:16px;background:var(--paper)}
+ol,ul{margin:0;padding-left:1.3em}li{margin:6px 0}
+a{color:var(--green);font-weight:700}
+.btn{display:inline-block;margin-top:16px;padding:11px 18px;border-radius:11px;background:var(--green);color:var(--bg);text-decoration:none}
+.small{color:var(--muted);font-size:.9rem}
+</style>
+<script type="module" src="/src/static-pages.ts"></script>
+</head>
+<body>
+<main>
+  <h1>Borrar tu cuenta</h1>
+  <p class="lead">El Baúl de los Jogos · la app para organizar tus juegos de mesa con tus amigos.</p>
+
+  <section class="card" aria-labelledby="steps">
+    <h2 id="steps" style="margin-top:0">Cómo borrarla</h2>
+    <p>Puedes hacerlo tú mismo, desde la app del móvil o desde esta web:</p>
+    <ol>
+      <li>Entra con tu cuenta.</li>
+      <li>Abre el menú de tu foto (arriba a la derecha) y elige <strong>Mi perfil</strong>.</li>
+      <li>Baja hasta <strong>Borrar mi cuenta</strong>, pulsa el botón y escribe tu apodo para confirmar.</li>
+    </ol>
+    <a class="btn" href="/login.html">Entrar para borrar mi cuenta</a>
+    <p class="small">¿No recuerdas la contraseña? En la pantalla de entrada pulsa «¿Olvidaste tu contraseña?» para recuperarla y después sigue estos pasos.</p>
+  </section>
+
+  <h2>Qué se borra</h2>
+  <ul>
+    <li>Tu cuenta, tu correo y tu apodo.</li>
+    <li>Tu foto de perfil.</li>
+    <li>Tu colección de juegos, tus lugares, tus amigos y tus grupos.</li>
+    <li>Tus propuestas de compra y tus votos.</li>
+    <li>Las partidas que registraste en tus grupos o sin grupo.</li>
+  </ul>
+  <p>Se borra al momento, en cuanto confirmas.</p>
+
+  <h2>Qué se conserva</h2>
+  <ul>
+    <li>Las partidas que registraste en grupos de otras personas se quedan en el historial de ese grupo, pero sin tu cuenta: tu nombre aparece como «Cuenta borrada».</li>
+    <li>Las partidas de otras personas en las que jugaste siguen existiendo para ellas, también con «Cuenta borrada» en lugar de tu nombre.</li>
+    <li>Si otras personas te tenían en su lista de amigos con un nombre que escribieron ellas, ese nombre sigue en su lista, pero ya no está unido a ninguna cuenta.</li>
+  </ul>
+</main>
+</body>
+</html>

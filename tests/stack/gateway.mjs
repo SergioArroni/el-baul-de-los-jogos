@@ -1,11 +1,16 @@
 // Stands in for Supabase + Vercel during integration tests: serves the built app
 // from dist/, forwards /rest/v1 to PostgREST and answers the few auth/storage/api
 // calls the app makes. Only for tests — it does no real authentication.
+import { createClient } from '@supabase/supabase-js';
 import { createServer } from 'node:http';
+import { createRequire } from 'node:module';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { extname, join, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { anonKey, REST_PORT } from './stack.mjs';
+import { anonKey, REST_PORT, sign, sql } from './stack.mjs';
+
+const require = createRequire(import.meta.url);
+const { deleteAccount, refusal } = require('../../api/_account.js');
 
 const PORT = 8790;
 const DIST = fileURLToPath(new URL('../../dist/', import.meta.url));
@@ -52,6 +57,28 @@ createServer(async (req, res) => {
     return json(res, 200, claims ? { id: claims.sub, email: claims.email } : {});
   }
   if (url.pathname.startsWith('/storage/v1/')) return json(res, 400, { error: 'Storage is not available in tests' });
+  if (url.pathname === '/api/delete-account') {
+    // Runs the real api/_account.js steps with full database access (like the secret key).
+    // Storage and the Auth admin API don't exist here: no photo to remove, and the user
+    // is deleted with SQL, which cascades exactly like Supabase Auth does.
+    const claims = claimsOf(req.headers.authorization);
+    if (!claims?.sub) return json(res, 401, { error: 'Inicia sesión para continuar.' });
+    const user = { id: claims.sub, email: claims.email, app_metadata: {} };
+    const reason = refusal(user);
+    if (reason) return json(res, 403, { error: reason });
+    const db = createClient(`http://localhost:${PORT}`, sign({ role: 'service_role' }), { auth: { persistSession: false, autoRefreshToken: false } });
+    const admin = {
+      from: table => db.from(table),
+      storage: { from: () => ({ list: async () => ({ data: [], error: null }), remove: async () => ({ data: null, error: null }) }) },
+      auth: { admin: { deleteUser: async id => (sql(`delete from auth.users where id = '${id}';`, { admin: true }), { data: null, error: null }) } },
+    };
+    try {
+      await deleteAccount(admin, user);
+      return json(res, 200, { deleted: true });
+    } catch (error) {
+      return json(res, 500, { error: error.message });
+    }
+  }
   if (url.pathname === '/api/friend-lookup') {
     // Same answer shape as api/friend-lookup.js, using the caller's token to read profiles.
     const claims = claimsOf(req.headers.authorization);
