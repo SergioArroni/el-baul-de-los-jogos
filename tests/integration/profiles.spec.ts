@@ -62,7 +62,7 @@ test('B makes the collection private and A stops seeing it', async ({ browser })
   await openProfile(a, 'usuario_b');
   await expect(a.getByText('@usuario_b tiene su colección en privado.')).toBeVisible();
   await expect(a.locator('.cover')).toHaveCount(0);
-  await expect(a.locator('.stat-tile', { hasText: 'Partidas' })).toContainText('1');
+  await expect(a.locator('.stat-tile', { has: a.getByText('Partidas', { exact: true }) })).toContainText('1');
 });
 
 test('C deletes the account: its data goes, plays in other groups stay without its name', async ({ browser }) => {
