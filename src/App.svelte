@@ -12,6 +12,7 @@
   import PlayForm from './sections/PlayForm.svelte';
   import Plays from './sections/Plays.svelte';
   import Profile from './sections/Profile.svelte';
+  import Ranking from './sections/Ranking.svelte';
   import Recommend from './sections/Recommend.svelte';
   import Wishlist from './sections/Wishlist.svelte';
   import { handleBackButton, hideSplash } from './platform/native';
@@ -62,6 +63,8 @@
       <Recommend onedit={id => (editGameId = id)} />
     {:else if app.tab === 'plays'}
       <Plays onplay={({ play, group }) => (playDialog = { open: true, play, group })} />
+    {:else if app.tab === 'ranking'}
+      <Ranking />
     {:else if app.tab === 'groups'}
       {#if app.personView}<PersonProfile userId={app.personView} />{:else}<Community />{/if}
     {:else if app.tab === 'newGames'}

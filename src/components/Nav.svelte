@@ -7,6 +7,7 @@
     ['catalog', '▦', 'Catálogo'],
     ['recommend', '✦', 'Qué jugamos'],
     ['plays', '⚑', 'Partidas'],
+    ['ranking', '🏆', 'Ranking'],
     ['groups', '♧', 'Comunidad'],
     ['newGames', '＋', 'Por comprar'],
   ];

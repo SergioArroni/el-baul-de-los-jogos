@@ -8,6 +8,7 @@ import { signedOutPage } from '../../src/domain/routes';
 import { needsPlaceMigration, normalizeGamePlace, seedGames, withDefaultPlaces } from '../../src/domain/seed';
 import { median, playStats, realDuration } from '../../src/domain/stats';
 import { diffRows, snapshotOf } from '../../src/domain/sync';
+import { learnTaste, monthsBetween } from '../../src/domain/taste';
 import { isValidNickname, localToday, nameKey, nicknameSuggestion, safeHttpUrl, withSuffix } from '../../src/domain/text';
 import type { Friend, Game, Group, Play } from '../../src/domain/types';
 
@@ -220,5 +221,41 @@ describe('real play time', () => {
   it('only shows a real time with at least three timed plays of that game', () => {
     expect(realDuration([timed(40), timed(50), timed(null)], 'Azul')).toBeNull();
     expect(realDuration([timed(40), timed(50), timed(70), timed(20, 'Catan')], 'azul')).toBe(50);
+  });
+});
+
+describe('learning your taste', () => {
+  const rated = (name: string, rating: number, user = 'me', played_on = '2026-10-01') =>
+    play({ id: name + user + rating, game_name: name, played_on, play_players: [{ id: 'x', play_id: 'p', name: user, user_id: user, points: null, winner: false, rating }] });
+  const collection = [
+    game({ id: '1', name: 'Hanabi', types: ['Cooperativo'], weight: 2 }),
+    game({ id: '2', name: 'Magic Maze', types: ['Cooperativo'], weight: 2 }),
+    game({ id: '3', name: 'Diplomacy', types: ['Estrategia'], weight: 5 }),
+    game({ id: '4', name: 'Agricola', types: ['Estrategia'], weight: 5 }),
+  ];
+
+  it('learns which styles and weight you rate well, counting only the chosen people', () => {
+    const taste = learnTaste([rated('Hanabi', 9), rated('Diplomacy', 3), rated('Diplomacy', 10, 'stranger')], collection, new Set(['me']));
+    expect(taste.styles.get('Cooperativo')).toBe(3.5);
+    expect(taste.styles.get('Estrategia')).toBe(-2.5);
+    expect(taste.weight).toBe(2);
+    expect(taste.worst.get('diplomacy')).toBe(3);
+  });
+
+  it('suggests games like the ones you love, and explains why', () => {
+    const taste = learnTaste([rated('Hanabi', 9), rated('Diplomacy', 3)], collection, new Set(['me']));
+    const result = recommend(collection, { players: 3, mood: '', weight: 0, duration: 0, place: '', taste, today: '2026-10-25' });
+    expect(result[0].game.name).toBe('Magic Maze');
+    expect(result[0].reasons).toContain('Te gustan los juegos de cooperativo');
+    expect(result[0].reasons).toContain('Aún no lo habéis estrenado');
+    expect(result.at(-1)?.game.name).not.toBe('Magic Maze');
+    expect(result.map(r => r.game.name)).not.toContain('Diplomacy');
+  });
+
+  it('brings back games you have not played in months', () => {
+    const taste = learnTaste([rated('Hanabi', 8, 'me', '2026-05-01')], collection, null);
+    const hanabi = recommend(collection, { players: 3, mood: '', weight: 0, duration: 0, place: '', taste, today: '2026-10-25' }).find(r => r.game.name === 'Hanabi');
+    expect(hanabi?.reasons).toContain('Hace 5 meses que no lo jugáis');
+    expect(monthsBetween('2026-01-31', '2026-02-28')).toBe(0);
   });
 });

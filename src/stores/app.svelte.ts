@@ -19,7 +19,7 @@ import type {
 /** Shown when the app opens without connection: the last synced copy is on screen, edits stay on this device. */
 const OFFLINE = 'Sin conexión · los cambios no se guardarán';
 
-export type Tab = 'catalog' | 'recommend' | 'plays' | 'groups' | 'newGames' | 'places' | 'profile' | 'backup';
+export type Tab = 'catalog' | 'recommend' | 'plays' | 'ranking' | 'groups' | 'newGames' | 'places' | 'profile' | 'backup';
 
 /**
  * Single source of truth for the screens. Components read these fields and call

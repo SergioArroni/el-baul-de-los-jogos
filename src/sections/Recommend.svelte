@@ -2,6 +2,8 @@
   import { groupMembers, playGroupKey } from '../domain/groups';
   import { recommend, type Recommendation } from '../domain/recommend';
   import { playStats } from '../domain/stats';
+  import { learnTaste } from '../domain/taste';
+  import { localToday } from '../domain/text';
   import type { Group } from '../domain/types';
   import { app } from '../stores/app.svelte';
   import RandomGame from './RandomGame.svelte';
@@ -27,8 +29,12 @@
   }
 
   function find() {
-    const groupGames = group ? playStats(app.plays.filter(p => playGroupKey(p) === app.groupKey(group))).games : undefined;
-    results = { list: recommend(app.games, { players, group, groupGames, mood, weight, duration, place }), players, group };
+    const groupPlays = group ? app.plays.filter(p => playGroupKey(p) === app.groupKey(group)) : app.plays;
+    const groupGames = group ? playStats(groupPlays).games : undefined;
+    // Whose ratings teach the taste: the group's members with an account, or just you.
+    const people = new Set([app.user?.id, ...members.map(member => member.userId)].filter((id): id is string => !!id));
+    const taste = app.plays.length ? learnTaste(groupPlays, app.games, people.size ? people : null) : undefined;
+    results = { list: recommend(app.games, { players, group, groupGames, mood, weight, duration, place, taste, today: localToday() }), players, group };
   }
 </script>
 
@@ -82,7 +88,7 @@
         <h3>Mis sugerencias para {results.players} {results.players === 1 ? 'persona' : 'personas'}{results.group ? ' · ' + results.group.name : ''}</h3>
         <p class="details">Son sugerencias orientativas: revisa los jugadores máximos si aparece un dato pendiente de confirmar.</p>
         <div class="grid">
-          {#each results.list as { game, groupNote } (game.id)}
+          {#each results.list as { game, groupNote, reasons } (game.id)}
             <article class="card">
               <div class="cardtop">
                 <div class="emoji">{game.types.includes('Cooperativo') ? '🤝' : game.types.includes('Fiesta') ? '🎉' : '🎲'}</div>
@@ -90,6 +96,7 @@
               </div>
               <div class="tags">{#each game.types as type (type)}<span class="tag">{type}</span>{/each}</div>
               {#if groupNote}<span class="reco-note">{groupNote}</span>{/if}
+              {#each reasons as reason (reason)}<span class="reco-reason">✦ {reason}</span>{/each}
               <p class="details">📍 {game.locations.join(' · ') || 'Lugar por asignar'}</p>
               <button class="btn secondary" onclick={() => onedit(game.id)}>Ver / editar ficha</button>
             </article>
