@@ -2,6 +2,7 @@
   import Icon from './Icon.svelte';
   import { coverUrl, findInLibrary } from '../content/library';
   import { gameArt } from '../domain/art';
+  import { ownedExpansions } from '../domain/expansions';
   import { averageRating } from '../domain/stats';
   import { formatDecimal, nameKey } from '../domain/text';
   import type { Game } from '../domain/types';
@@ -12,6 +13,7 @@
 
   const art = $derived(gameArt(game));
   const entry = $derived(findInLibrary(game.name));
+  const expansions = $derived(ownedExpansions(game));
   const rating = $derived(averageRating(app.stats.games.get(nameKey(game.name))));
 </script>
 
@@ -20,6 +22,7 @@
   <span class="cover-meta">
     <span><Icon name="players" /> {game.players || '?'}</span>
     {#if game.duration}<span><Icon name="clock" /> {game.duration}′</span>{/if}
+    {#if expansions}<span class="cover-expansions" title="{expansions} {expansions === 1 ? 'expansión' : 'expansiones'}"><Icon name="layers" /> +{expansions}</span>{/if}
   </span>
   {#if !entry}<span class="cover-emoji" aria-hidden="true"><Icon name={art.icon} size="1em" /></span>{/if}
   <span>

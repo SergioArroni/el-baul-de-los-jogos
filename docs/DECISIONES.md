@@ -189,3 +189,18 @@ Cuando una decisión cambie, no se borra: se marca como **Sustituida** y se aña
 - **Decisión:** Jogiño, un meeple de madera con ojos saltones (`src/mascot/`). Vive en una balda en la esquina, en la landing y en la app: al tocarlo abre un bocadillo que lleva a conectar Claude o ChatGPT; se puede coger y lanzar (física propia en `physics.ts`: gravedad, rebotes en los bordes y rozamiento, con pruebas), y al caer se levanta, vuelve andando y sube a su balda con una escalera. Las pupilas tienen su propio muelle, así que bailan con cada golpe y siguen al ratón. Sale también en las pantallas vacías, en la página de permiso («¿Le dejo pasar?»), en la nueva sección «Conectar con Claude o ChatGPT» de «Mi perfil» y como icono del conector (`icons` del servidor MCP). Color madera por defecto, o rojo, azul, verde, negro o blanco; el color y si se esconde se guardan en el navegador.
 - **Alternativas:** un chat propio dentro de la app (cada mensaje costaría dinero); un baúl o un dado como mascota (el meeple es lo más reconocible de los juegos de mesa); GSAP Draggable con Inertia para lanzarlo (no rebota en los bordes ni camina: la física propia son 60 líneas).
 - **Consecuencias:** con «reducir movimiento» se queda quieto en su balda y solo abre el bocadillo. En el móvil tapa un poco la esquina de abajo: por eso se puede esconder desde su bocadillo o desde «Mi perfil». El color se guarda en cada dispositivo, no en la cuenta.
+
+## 24. Iconos propios en vez de emojis
+**Estado:** Aceptada, en `dev`.
+
+- **Contexto:** los emojis de color (⚡, 🎉, 📍, 🥇…) salían distintos en cada sistema y no casaban con el tema.
+- **Decisión:** un juego pequeño de iconos de línea en SVG (`src/components/icons.ts` y `Icon.svelte`) que toman el color del texto, como los de la barra de pestañas. Los signos tipográficos que ya siguen el tema (✦, ★, ✓, ☀) se quedan.
+- **Consecuencias:** los iconos se ven igual en todas partes y en modo oscuro. Un icono nuevo es una línea más en `icons.ts`.
+
+## 25. Las expansiones van dentro de su juego
+**Estado:** Aceptada, en `dev`. Falta ejecutar `sql/play-expansions.sql`.
+
+- **Contexto:** las expansiones se guardaban como juegos aparte («Scythe: El auge de Fenris»), duplicando portadas y estadísticas.
+- **Decisión:** cada juego guarda los nombres de las expansiones que tienes (`expansions` dentro de sus datos, sin SQL). La lista de expansiones conocidas está en `src/content/expansions.ts`, con portada dibujada para cada una (`scripts/covers/expansions.mjs`); se pueden añadir otras a mano (usan la portada del juego base con una cinta). En la ficha salen en color las que tienes y en blanco y negro las que no; se marcan con un toque y las que faltan se pueden proponer en «Por comprar». Las que ya estaban como juego aparte se detectan (`mergeCandidates`) y se ofrecen mover dentro, con confirmación; tus partidas de ellas pasan al juego base con la expansión apuntada. Las partidas guardan con qué expansiones se jugaron (`plays.expansions`, `sql/play-expansions.sql`); sin ese SQL se guardan sin ese dato. El conector de Claude y ChatGPT también las ve.
+- **Alternativas:** una tabla de expansiones en la base de datos (más SQL y más sincronización para algo que vive bien en los datos del juego); sacar la lista de BGG (llegará cuando haya token: BGG enlaza cada juego con sus expansiones).
+- **Consecuencias:** las partidas de otras personas con el nombre antiguo de la expansión no se tocan. Los nombres en español de algunas expansiones (p. ej. The Wind Gambit) están en inglés hasta confirmar la edición española.

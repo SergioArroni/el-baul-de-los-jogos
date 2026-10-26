@@ -10,6 +10,7 @@ Al terminarla, se borra de aquí.
 - **Activar Google** en Google Cloud y Supabase (`docs/GOOGLE-LOGIN.md`), incluida la URL de la APK.
 - **Reglas de 7 juegos** sin explicación fiable: Game Off, ¿Alguien ha probado este juego?,
   La Vacuna Española, El Cubilete, el juego de beber, Codex y Brink.
+- **Ejecutar `sql/play-expansions.sql`** en Supabase (con qué expansiones se jugó cada partida).
 - **Catálogo BGG**: programado; falta registrar la app en BGG, el token y `sql/catalog.sql` (`docs/BGG.md`).
 
 ## Publicar en Google Play (acordado el 2026-10-25; sin monetizar de momento)
@@ -22,5 +23,6 @@ Al terminarla, se borra de aquí.
    obliga a pasar Vercel a Pro, a pedir licencia comercial a BGG y a revisar lo fiscal.
 
 ## Ideas nuevas
+- **Expansiones desde BGG:** cuando haya token, completar la lista de expansiones de cualquier juego con las de BGG (`boardgameexpansion`).
 - **Tarjetas dentro del chat (MCP Apps):** que Claude y ChatGPT enseñen las recomendaciones con portadas y Jogiño en la propia conversación, no solo texto.
 - **Color de Jogiño en la cuenta:** hoy se guarda por dispositivo; guardarlo en el perfil (columna nueva) para que salga igual en el móvil y en el ordenador.

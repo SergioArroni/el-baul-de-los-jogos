@@ -1,4 +1,5 @@
 <script lang="ts">
+  import ExpansionShelf from '../components/ExpansionShelf.svelte';
   import Icon, { type IconName } from '../components/Icon.svelte';
   import Modal from '../components/Modal.svelte';
   import { coverUrl, findInLibrary } from '../content/library';
@@ -20,6 +21,8 @@
 
   let { game, onclose, readonly = false, onedit, ondelete, onplay }: Props = $props();
 
+  // The saved version, so changes made from the sheet (its expansions) show at once.
+  const current = $derived(game ? (app.games.find(g => g.id === game.id) ?? game) : null);
   const art = $derived(game ? gameArt(game) : null);
   const entry = $derived(game ? findInLibrary(game.name) : undefined);
   const rules = $derived(entry?.rules);
@@ -56,6 +59,7 @@
         {#each game.types as type (type)}<span class="tag green">{type}</span>{/each}
       </div>
       {#if game.notes}<p class="details">{game.notes}</p>{/if}
+      {#if current}<ExpansionShelf game={current} {readonly} />{/if}
       {#if rules}
         <section class="how-to" aria-labelledby="howToTitle">
           <h3 id="howToTitle">Cómo se juega</h3>

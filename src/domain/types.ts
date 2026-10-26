@@ -13,6 +13,8 @@ export interface Game {
   /** BoardGameGeek id, when it was filled in from the catalog. */
   bggId?: number;
   notes: string;
+  /** Expansions you own, by name (src/domain/expansions.ts). */
+  expansions?: string[];
 }
 
 export interface Place {
@@ -74,6 +76,8 @@ export interface Play {
   notes: string | null;
   /** How long it lasted. Missing in old plays and before sql/plays-duration.sql. */
   duration_minutes?: number | null;
+  /** Expansions played with. Missing before sql/play-expansions.sql. */
+  expansions?: string[] | null;
   created_at: string;
   play_players: PlayPlayer[];
 }

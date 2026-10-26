@@ -4,6 +4,8 @@
   import GameCover from '../components/GameCover.svelte';
   import Icon from '../components/Icon.svelte';
   import { typeIcon } from '../domain/art';
+  import { mergeCandidates, mergeInto, type MergeCandidate } from '../domain/expansions';
+  import { movePlaysToBase } from '../data/plays';
   import { buildShelves, byName, filterGames, noFilters, topTypes, type CatalogFilters } from '../domain/catalog';
   import type { Game } from '../domain/types';
   import { deal, flipList } from '../motion';
@@ -39,6 +41,30 @@
   });
 
   const clearFilters = () => (filters = { search: '', type: '', players: 0, place: '' });
+
+  // Expansions saved as games of their own whose base game is also here: offer to move them in.
+  const merges = $derived(mergeCandidates(app.games));
+  let mergeStatus = $state('');
+
+  async function merge({ expansion, base, name }: MergeCandidate) {
+    const ok = await askConfirm({
+      title: `¿Meter «${expansion.name}» dentro de ${base.name}?`,
+      text: `Dejará de salir como juego aparte y aparecerá en color entre las expansiones de ${base.name}. Tus partidas de «${expansion.name}» pasan a ser de ${base.name} jugando con ${name}.`,
+      confirmLabel: 'Meterla dentro',
+    });
+    if (!ok) return;
+    app.upsertGame(mergeInto(base, expansion, name));
+    app.deleteGame(expansion.id);
+    mergeStatus = `«${name}» está ahora dentro de ${base.name}.`;
+    if (app.user && !app.playsMissing) {
+      try {
+        await movePlaysToBase(expansion.name, base.name, name, app.user.id);
+        await app.reloadPlays();
+      } catch (error) {
+        mergeStatus = `Hecho, pero sus partidas siguen con el nombre antiguo: ${(error as Error).message}`;
+      }
+    }
+  }
 
   async function remove(game: Game) {
     detail = null;
@@ -85,6 +111,22 @@
       </button>
     {/each}
   </div>
+
+  {#if merges.length && !filtering}
+    <div class="card merge-offer">
+      <h2><Icon name="layers" /> Expansiones guardadas como juego aparte</h2>
+      <p>Ahora las expansiones van dentro de su juego. Puedes moverlas, con sus partidas:</p>
+      <ul>
+        {#each merges as candidate (candidate.expansion.id)}
+          <li>
+            <span><strong>{candidate.expansion.name}</strong> → dentro de {candidate.base.name}</span>
+            <button type="button" class="btn secondary small" onclick={() => merge(candidate)}>Meterla dentro</button>
+          </li>
+        {/each}
+      </ul>
+    </div>
+  {/if}
+  {#if mergeStatus}<p class="notice" role="status">{mergeStatus}</p>{/if}
 
   {#if !app.games.length}
     <EmptyState>Tu baúl está vacío. Pulsa «Añadir juego» para guardar el primero.</EmptyState>

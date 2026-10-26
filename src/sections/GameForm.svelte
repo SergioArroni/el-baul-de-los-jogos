@@ -2,6 +2,8 @@
   import CatalogSuggest from '../components/CatalogSuggest.svelte';
   import Modal from '../components/Modal.svelte';
   import type { GameDraft } from '../data/catalog';
+  import { findInLibrary } from '../content/library';
+  import { expansionNamed, mergeInto } from '../domain/expansions';
   import { nameKey } from '../domain/text';
   import type { Game } from '../domain/types';
   import { untrack } from 'svelte';
@@ -15,6 +17,21 @@
   const placeNames = $derived([...new Set([...app.places.map(place => place.name), ...(game?.locations ?? [])])]);
   let status = $state('');
   let bggId = $state<number | undefined>();
+
+  // Typing an expansion of a game you already have: it can go inside that game instead.
+  const inside = $derived.by(() => {
+    if (game) return null;
+    const entry = expansionNamed(form.name.trim());
+    const base = entry && app.games.find(g => findInLibrary(g.name)?.slug === entry.base);
+    return entry && base ? { base, name: entry.names[0] } : null;
+  });
+
+  function putInside() {
+    if (!inside) return;
+    const chosen = placeNames.filter(name => form.locations.includes(name));
+    app.upsertGame(mergeInto(inside.base, { ...inside.base, locations: chosen }, inside.name));
+    onclose();
+  }
 
   /** A game picked from the catalog fills the form; anything can still be edited. */
   function fill(draft: GameDraft) {
@@ -48,6 +65,8 @@
       locations: placeNames.filter(name => form.locations.includes(name)),
       notes: form.notes.trim(),
       ...(bggId ? { bggId } : {}),
+      // Its expansions are edited from the game's sheet: keep them.
+      ...(game?.expansions ? { expansions: game.expansions } : {}),
     };
     if (app.games.some(g => g.id !== saved.id && nameKey(g.name) === nameKey(saved.name))) {
       status = 'Ya hay un juego con ese nombre en tu colección.';
@@ -61,7 +80,11 @@
 <Modal {open} title={game ? 'Editar juego' : 'Añadir juego'} {onclose}>
   <form onsubmit={submit}>
     <div class="formgrid">
-      <div class="field"><label for="gName">Nombre *</label><input id="gName" required maxlength="100" autocomplete="off" bind:value={form.name} /><CatalogSuggest query={form.name} onpick={fill} /></div>
+      <div class="field"><label for="gName">Nombre *</label><input id="gName" required maxlength="100" autocomplete="off" bind:value={form.name} /><CatalogSuggest query={form.name} onpick={fill} />
+        {#if inside}
+          <p class="notice expansion-inside">Es una expansión de <strong>{inside.base.name}</strong>, que ya tienes. <button type="button" class="linkbutton" onclick={putInside}>Meterla dentro de {inside.base.name}</button></p>
+        {/if}
+      </div>
       <div class="field"><label for="gPlayers">Jugadores (mín.–máx.)</label><input id="gPlayers" placeholder="Ej. 2–6" bind:value={form.players} /></div>
       <div class="field"><label for="gTypes">Estilos (separados por comas)</label><input id="gTypes" placeholder="Fiesta, Cartas, Humor" bind:value={form.types} /></div>
       <div class="field">

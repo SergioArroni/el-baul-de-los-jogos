@@ -40,6 +40,7 @@ export function formatGame(game: Game): string {
     game.weight && `dureza ${game.weight}/5`,
     game.types.length && game.types.join(', '),
     game.locations.length && `en ${game.locations.join(', ')}`,
+    game.expansions?.length && `con las expansiones ${game.expansions.join(', ')}`,
   ].filter(Boolean);
   return `- ${game.name}${facts.length ? ` (${facts.join('; ')})` : ''}${game.notes ? ` — ${game.notes}` : ''}`;
 }

@@ -4,6 +4,7 @@
   import Modal from '../components/Modal.svelte';
   import { deletePlay, savePlay, type PlayerDraft } from '../data/plays';
   import { tap } from '../platform/native';
+  import { expansionsOf } from '../domain/expansions';
   import { groupMembers, playGroupKey, splitGroupKey } from '../domain/groups';
   import { localToday, nameKey } from '../domain/text';
   import type { Play } from '../domain/types';
@@ -25,7 +26,14 @@
   interface Candidate { key: string; name: string; userId: string | null }
   type Draft = PlayerDraft & { key: string };
 
-  let form = $state({ game: '', date: '', minutes: '', group: '', place: '', notes: '' });
+  let form = $state({ game: '', date: '', minutes: '', group: '', place: '', notes: '', expansions: [] as string[] });
+
+  // The expansions you own of the game being logged, to say which ones you played with.
+  const ownedExpansions = $derived.by(() => {
+    const chosen = app.games.find(g => nameKey(g.name) === nameKey(form.game));
+    const owned = chosen ? expansionsOf(chosen).filter(view => view.owned).map(view => view.name) : [];
+    return [...new Set([...owned, ...form.expansions])];
+  });
   let players = $state<Draft[]>([]);
   let status = $state('');
   let saving = $state(false);
@@ -82,6 +90,7 @@
       group: play ? playGroupKey(play) : groupOptions.some(o => o.key === presetGroup) ? presetGroup : '',
       place: play?.place ?? '',
       notes: play?.notes ?? '',
+      expansions: play?.expansions ?? [],
     };
     if (play) {
       players = play.play_players.map(x => ({
@@ -115,6 +124,7 @@
       await savePlay({
         game_name: form.game.trim(), played_on: form.date, place: form.place || null, notes: form.notes.trim() || null,
         duration_minutes: form.minutes ? minutes : null,
+        expansions: form.expansions.filter(name => ownedExpansions.includes(name)),
         group_owner: key?.owner ?? null, group_key: key?.id ?? null, group_name: key ? group?.name ?? play?.group_name ?? null : null,
       }, $state.snapshot(players), me, play);
       tap();
@@ -161,6 +171,16 @@
           {#each groupOptions as option (option.key)}<option value={option.key}>{option.name}</option>{/each}
         </select>
       </div>
+      {#if ownedExpansions.length}
+        <div class="field full">
+          <span class="field-label">¿Con qué expansiones?</span>
+          <div class="expansion-picks" role="group" aria-label="Expansiones usadas">
+            {#each ownedExpansions as name (name)}
+              <label class="type-chip expansion-pick"><input type="checkbox" value={name} bind:group={form.expansions} /><Icon name="layers" /> {name}</label>
+            {/each}
+          </div>
+        </div>
+      {/if}
       <div class="field">
         <label for="playPlace">Lugar</label>
         <select id="playPlace" bind:value={form.place}>

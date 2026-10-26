@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 400">
+<defs>
+<linearGradient id="bg" x1="0" y1="0" x2="0.4" y2="1"><stop offset="0" stop-color="#3c096c"/><stop offset="1" stop-color="#0b0f0b"/></linearGradient>
+<radialGradient id="glow" cx="0.5" cy="0.275" r="0.45"><stop offset="0" stop-color="#c8b6ff" stop-opacity="0.35"/><stop offset="1" stop-color="#c8b6ff" stop-opacity="0"/></radialGradient>
+<filter id="grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" seed="4"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0.7 0 0 0 -0.3"/></filter>
+<filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#000" flood-opacity="0.25"/></filter>
+</defs>
+<rect width="300" height="400" fill="url(#bg)"/>
+<rect width="300" height="400" fill="url(#glow)"/>
+<g filter="url(#shadow)">
+    <path d="M100 210V120l50-46 50 46v90z" fill="#22223b"/><circle cx="150" cy="136" r="30" fill="#c8b6ff" opacity="0.85"/>
+    <path d="M150 106v60M120 136h60M129 115l42 42M171 115l-42 42" stroke="#3c096c" stroke-width="3"/>
+    <rect x="64" y="200" width="12" height="30" rx="3" fill="#fefae0"/><path d="M70 200c-6-8 0-16 0-20c0 4 6 12 0 20z" fill="#ffb703"/><rect x="224" y="200" width="12" height="30" rx="3" fill="#fefae0"/><path d="M230 200c-6-8 0-16 0-20c0 4 6 12 0 20z" fill="#ffb703"/><rect x="104" y="216" width="12" height="30" rx="3" fill="#fefae0"/><path d="M110 216c-6-8 0-16 0-20c0 4 6 12 0 20z" fill="#ffb703"/><rect x="184" y="216" width="12" height="30" rx="3" fill="#fefae0"/><path d="M190 216c-6-8 0-16 0-20c0 4 6 12 0 20z" fill="#ffb703"/></g>
+<rect width="300" height="400" filter="url(#grain)" opacity="0.3"/>
+</svg>

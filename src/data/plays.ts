@@ -17,11 +17,24 @@ export async function loadPlays(): Promise<PlaysResult> {
   return { plays: data as Play[], missing: false };
 }
 
-export type PlayRow = Pick<Play, 'game_name' | 'played_on' | 'place' | 'notes' | 'group_owner' | 'group_key' | 'group_name' | 'duration_minutes'>;
+export type PlayRow = Pick<Play, 'game_name' | 'played_on' | 'place' | 'notes' | 'group_owner' | 'group_key' | 'group_name' | 'duration_minutes' | 'expansions'>;
 
-/** PGRST204: the duration column doesn't exist yet (sql/plays-duration.sql not run). */
-const missingDuration = (error: { code?: string; message?: string } | null) => error?.code === 'PGRST204' && /duration_minutes/.test(error.message ?? '');
-const withoutDuration = ({ duration_minutes: _, ...row }: PlayRow) => row;
+// Columns added by later SQL files: until they are run, PostgREST answers PGRST204 naming the
+// column, and the play is saved without it (sql/plays-duration.sql, sql/play-expansions.sql).
+const OPTIONAL = ['duration_minutes', 'expansions'] as const;
+type DbError = { code?: string; message?: string } | null;
+const missingColumn = (error: DbError) => error?.code === 'PGRST204' ? OPTIONAL.find(column => error.message?.includes(column)) : undefined;
+
+/** Runs a write and, while it complains about a column that doesn't exist yet, retries without it. */
+async function withoutMissing<T extends { error: DbError }>(row: Partial<PlayRow>, write: (row: Partial<PlayRow>) => PromiseLike<T>): Promise<T> {
+  let result = await write(row);
+  for (let column = missingColumn(result.error); column; column = missingColumn(result.error)) {
+    const { [column]: _, ...rest } = row;
+    row = rest;
+    result = await write(row);
+  }
+  return result;
+}
 
 /** A player in the form; `rowId` is set for players already saved. */
 export interface PlayerDraft {
@@ -44,12 +57,10 @@ export async function savePlay(row: PlayRow, players: PlayerDraft[], me: string,
   let created = false;
   try {
     if (existing) {
-      let { error } = await db.from('plays').update(row).eq('id', existing.id);
-      if (missingDuration(error)) ({ error } = await db.from('plays').update(withoutDuration(row)).eq('id', existing.id));
+      const { error } = await withoutMissing(row, values => db.from('plays').update(values).eq('id', existing.id));
       if (error) throw error;
     } else {
-      let { data, error } = await db.from('plays').insert(row).select('id').single();
-      if (missingDuration(error)) ({ data, error } = await db.from('plays').insert(withoutDuration(row)).select('id').single());
+      const { data, error } = await withoutMissing(row, values => db.from('plays').insert(values).select('id').single());
       if (error || !data) throw error ?? new Error('No se pudo guardar la partida.');
       id = data.id as string;
       created = true;
@@ -89,5 +100,16 @@ export async function deletePlay(id: string): Promise<void> {
 /** Each participant rates the game for themselves through a database function. */
 export async function ratePlay(id: string, rating: number | null): Promise<void> {
   const { error } = await requireClient().rpc('rate_play', { pid: id, value: rating });
+  if (error) throw error;
+}
+
+/**
+ * An expansion that was its own game moves inside its base game: your plays of it become
+ * plays of the base game played with that expansion. Other people's plays stay as they are.
+ */
+export async function movePlaysToBase(from: string, to: string, expansion: string, me: string): Promise<void> {
+  const db = requireClient();
+  const { error } = await withoutMissing({ game_name: to, expansions: [expansion] }, values =>
+    db.from('plays').update(values).eq('owner_id', me).eq('game_name', from));
   if (error) throw error;
 }

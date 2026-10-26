@@ -113,7 +113,7 @@
           {@const myRow = play.play_players.find(x => x.user_id === me)}
           {@const avg = average(play)}
           <article class="card">
-            <div class="cardtop"><div class="emoji"><Icon name="dice" /></div><div><h3>{play.game_name}</h3><div class="sub">{formatDate(play.played_on)}{#if play.place} · <Icon name="pin" /> {play.place}{/if}</div></div></div>
+            <div class="cardtop"><div class="emoji"><Icon name="dice" /></div><div><h3>{play.game_name}</h3>{#if play.expansions?.length}<div class="play-expansions"><Icon name="layers" /> con {play.expansions.join(', ')}</div>{/if}<div class="sub">{formatDate(play.played_on)}{#if play.place} · <Icon name="pin" /> {play.place}{/if}</div></div></div>
             <ul class="play-players">
               {#each sortedPlayers(play) as player (player.id)}
                 <li>

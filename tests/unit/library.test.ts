@@ -1,3 +1,4 @@
+import { EXPANSIONS } from '../../src/content/expansions';
 import { existsSync, readdirSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { LIBRARY, coverUrl, findInLibrary, libraryKey } from '../../src/content/library';
@@ -27,8 +28,8 @@ describe('game library', () => {
     expect(missing).toEqual([]);
   });
 
-  it('has no cover without a game', () => {
-    const slugs = new Set(LIBRARY.map(entry => entry.slug));
+  it('has no cover without a game or an expansion', () => {
+    const slugs = new Set([...LIBRARY, ...EXPANSIONS].map(entry => entry.slug));
     const orphans = readdirSync('public/covers').map(file => file.replace(/\.svg$/, '')).filter(slug => !slugs.has(slug));
     expect(orphans).toEqual([]);
   });

@@ -188,3 +188,33 @@ test('Jogiño can be thrown and walks back to his shelf', async ({ page }) => {
   expect(Math.abs(back.x - home.x)).toBeLessThan(2);
   expect(Math.abs(back.y - home.y)).toBeLessThan(2);
 });
+
+test('expansions saved as games move inside their base game, and show in colour when owned', async ({ page }) => {
+  const offer = page.locator('.merge-offer');
+  await expect(offer).toContainText('Scythe: El auge de Fenris');
+  await expect(offer).toContainText('Dominion: Terramar');
+  await offer.locator('li', { hasText: 'Scythe: El auge de Fenris' }).getByRole('button', { name: 'Meterla dentro' }).click();
+  await page.locator('.confirm-dialog').getByRole('button', { name: 'Meterla dentro' }).click();
+  await expect(offer).not.toContainText('Scythe: El auge de Fenris');
+  await expect(covers(page)).toHaveCount(41);
+
+  // Inside Scythe: Fenris in colour (owned), the rest in black and white until tapped.
+  await covers(page).filter({ hasText: /^.*Scythe.*$/ }).first().click();
+  const sheet = page.getByRole('dialog');
+  await expect(sheet.getByRole('button', { name: 'El auge de Fenris: la tienes' })).toHaveAttribute('aria-pressed', 'true');
+  await sheet.getByRole('button', { name: 'Encuentros: no la tienes' }).click();
+  await expect(sheet.getByRole('button', { name: 'Encuentros: la tienes' })).toHaveAttribute('aria-pressed', 'true');
+  await sheet.getByLabel('Añadir otra expansión').fill('Mapa modular');
+  await sheet.getByRole('button', { name: 'Añadir', exact: true }).click();
+  await expect(sheet.getByRole('button', { name: 'Mapa modular: la tienes' })).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(covers(page).filter({ hasText: 'Scythe' }).first()).toContainText('+3');
+});
+
+test('typing an expansion of a game you have offers to put it inside', async ({ page }) => {
+  await page.getByRole('button', { name: 'Añadir juego' }).click();
+  await page.getByLabel('Nombre *').fill('Scythe: Encuentros');
+  await page.getByRole('button', { name: 'Meterla dentro de Scythe' }).click();
+  await covers(page).filter({ hasText: 'Scythe' }).first().click();
+  await expect(page.getByRole('dialog').getByRole('button', { name: 'Encuentros: la tienes' })).toBeVisible();
+});
