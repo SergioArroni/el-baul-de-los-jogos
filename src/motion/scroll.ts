@@ -31,9 +31,14 @@ export function splitReveal(node: HTMLElement, options: { by?: 'words' | 'chars'
   const by = options.by ?? 'words';
   void document.fonts.ready.then(() => {
     split = SplitText.create(node, { type: by === 'chars' ? 'words,chars' : 'words', mask: by });
+    // Each mask is one line tall, and display headings have tight lines: give it room above
+    // and below (without moving anything) so accents and the tails of g, j, y aren't cut.
+    gsap.set(split.masks, { paddingBlock: '.2em', marginBlock: '-.2em' });
     gsap.from(by === 'chars' ? split.chars : split.words, {
       yPercent: 110, duration: 0.8, stagger: by === 'chars' ? 0.025 : 0.06, ease: 'power4.out', delay: options.delay ?? 0,
       scrollTrigger: { trigger: node, start: 'top 88%', once: true },
+      // Once risen, back to plain text: no masks left to clip it, and it wraps normally again.
+      onComplete: () => split?.revert(),
     });
   });
   return { destroy: () => split?.revert() };

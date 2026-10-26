@@ -9,12 +9,11 @@ Al terminarla, se borra de aquí.
 - **Pasar `dev` a `main`** siguiendo `PUBLICAR.md` (cuando lo revises).
 - **Ejecutar en Supabase**, en orden: `sql/wishlist-meeples.sql`, `sql/plays-duration.sql`,
   `sql/ranking.sql`, `sql/google-login.sql`, `sql/similar-taste.sql` y `sql/catalog.sql`.
-- **Activar Google** en Google Cloud y Supabase (`docs/GOOGLE-LOGIN.md`).
+- **Activar Google** en Google Cloud y Supabase (`docs/GOOGLE-LOGIN.md`), incluida la URL de la APK.
 - **Correo de contacto** para la política de privacidad (`src/content/legal.ts`) y hacer la página.
 - **Frases reales de amigos** para la landing, con su permiso.
 - **Reglas de 7 juegos** sin explicación fiable: Game Off, ¿Alguien ha probado este juego?,
   La Vacuna Española, El Cubilete, el juego de beber, Codex y Brink.
-- **«Entrar con Google» en la APK**: necesita un plugin nativo.
 - **Catálogo BGG**: programado; falta registrar la app en BGG, el token y `sql/catalog.sql` (`docs/BGG.md`).
 
 ## Publicar en Google Play (acordado el 2026-10-25; sin monetizar de momento)

@@ -16,9 +16,12 @@ vez):
    secreto.
 5. **Supabase → Authentication → URL Configuration → Redirect URLs**: añade
    `https://el-baul-de-los-jogos.vercel.app/login.html` (y la de `dev` si quieres probarlo ahí:
-   `https://el-baul-de-los-jogos-git-dev-deus20.vercel.app/login.html`).
+   `https://el-baul-de-los-jogos-git-dev-deus20.vercel.app/login.html`) y, para la APK,
+   `es.sergioarroni.miludoteca://login-callback`.
 6. Ejecuta `sql/google-login.sql` en Supabase: sin él, las cuentas nuevas de Google fallan porque la
    base de datos exige un apodo. Con él, reciben uno a partir de su correo (cambiable en «Mi perfil»).
 
-**Limitación:** dentro de la APK el botón no aparece, porque Google no permite iniciar sesión dentro
-de una vista web incrustada. Para la app haría falta un plugin nativo de Google; queda para más adelante.
+**En la APK:** Google no deja iniciar sesión dentro de la vista web de una app, así que el botón
+abre el navegador del móvil y, al terminar, Supabase devuelve a la app con el enlace
+`es.sergioarroni.miludoteca://login-callback` (por eso hay que añadirlo en el paso 5). La app
+canjea ese enlace por la sesión con PKCE: aunque otra app lo interceptara, no podría usarlo.

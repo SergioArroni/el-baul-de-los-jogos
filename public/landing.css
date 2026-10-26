@@ -24,7 +24,7 @@ body { background: var(--bg); font-family: var(--font-body); }
 .problem { padding: clamp(80px, 12vw, 140px) 0 60px; overflow: hidden; }
 .problem p { color: var(--muted); font-size: 1.12rem; }
 .scatter { width: min(100% - 32px, 920px); margin: 46px auto 0; display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; }
-.scatter-card { width: 100%; aspect-ratio: 3 / 4; border: 3px solid #fffefa; border-radius: 12px; box-shadow: var(--card-shadow); }
+.scatter-card { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; border: 3px solid #fffefa; border-radius: 12px; box-shadow: var(--card-shadow); }
 
 .features { padding: clamp(60px, 9vw, 110px) clamp(16px, 5vw, 72px); }
 .features-layout { display: grid; grid-template-columns: minmax(280px, 380px) 1fr; gap: clamp(30px, 6vw, 90px); max-width: 1120px; margin: 50px auto 0; }
@@ -55,7 +55,7 @@ body { background: var(--bg); font-family: var(--font-body); }
 .mock-privacy { display: grid; grid-template-columns: 1fr auto; gap: 8px 10px; padding: 13px; border: 1px solid var(--line); border-radius: 14px; background: var(--paper); font-size: .82rem; }
 .mock-privacy span { color: var(--muted); }
 .mock-covers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.mock-covers img { width: 100%; aspect-ratio: 3 / 4; border-radius: 9px; }
+.mock-covers img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; border-radius: 9px; }
 .mock-wish { display: flex; align-items: center; justify-content: space-between; padding: 13px; border: 1px solid var(--line); border-radius: 14px; background: var(--paper); }
 .mock-hint { margin: 0; color: var(--orange); font-weight: 700; font-size: .85rem; text-align: center; }
 .mock-chat { justify-content: center; }

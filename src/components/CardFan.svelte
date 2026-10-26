@@ -80,6 +80,8 @@
     bottom: 0;
     width: var(--fan-w);
     aspect-ratio: 3 / 4;
+    /* The white border eats into the 3:4 box: fill it edge to edge, not letterboxed. */
+    object-fit: cover;
     margin-left: calc(var(--fan-w) / -2);
     border: 4px solid #fffefa;
     border-radius: 14px;
