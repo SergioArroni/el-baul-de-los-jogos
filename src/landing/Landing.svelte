@@ -105,7 +105,7 @@
 {/snippet}
 
 <header class="land-top">
-  <a class="land-brand" href="/inicio"><span class="brand-mark" aria-hidden="true">🎲</span>El Baúl de los Jogos</a>
+  <a class="land-brand" href="/inicio"><span class="brand-mark" aria-hidden="true"><span class="logo-shape"></span></span>El Baúl de los Jogos</a>
   <nav aria-label="Acceso"><a class="btn ghost small" href={LOGIN}>Entrar</a></nav>
 </header>
 

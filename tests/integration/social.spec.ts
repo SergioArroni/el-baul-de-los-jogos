@@ -76,7 +76,7 @@ test('A logs a play in the group with points, winner and a rating', async ({ bro
   await expect(form).toBeHidden();
 
   const card = page.locator('.card', { hasText: 'Carcassonne' });
-  await expect(card).toContainText('Yo 🏆');
+  await expect(card).toContainText('Yo');
   await expect(card).toContainText('Nota media 8/10');
   await expect(page.locator('.stat-tile', { hasText: 'Quién gana más' })).toContainText('1 victoria');
 });
@@ -107,7 +107,7 @@ test("editing the play keeps the other players' ratings", async ({ browser }) =>
 
 test('the play shows in the catalog sheet and in "¿Qué jugamos?"', async ({ browser }) => {
   const page = await openAs(browser, 'a');
-  await expect(page.getByRole('heading', { name: '⭐ Vuestros favoritos' })).toHaveCount(0);
+  await expect(page.getByRole('heading', { name: 'Vuestros favoritos' })).toHaveCount(0);
   await page.getByLabel('Buscar en la colección').fill('carcassonne');
   await page.locator('.cover-grid .cover').first().click();
   await expect(page.locator('.detail-stats')).toContainText('★ 8,5');

@@ -1,3 +1,4 @@
+import type { IconName } from '../components/icons';
 import { maxPlayers, supports } from './players';
 import { averageRating, type GameStat } from './stats';
 import { nameKey } from './text';
@@ -35,6 +36,7 @@ export function topTypes(games: Game[], limit = 12): string[] {
 
 export interface Shelf {
   title: string;
+  icon: IconName;
   games: Game[];
 }
 
@@ -42,11 +44,11 @@ export interface Shelf {
 export function buildShelves(games: Game[], stats: Map<string, GameStat>, hasPlays: boolean): Shelf[] {
   const avg = (game: Game) => averageRating(stats.get(nameKey(game.name))) ?? 0;
   const shelves: Shelf[] = [
-    { title: '⭐ Vuestros favoritos', games: games.filter(g => avg(g) >= 7).sort((a, b) => avg(b) - avg(a)) },
-    { title: '⚡ Para una partida rápida', games: games.filter(g => g.duration && g.duration <= 30).sort((a, b) => (a.duration ?? 0) - (b.duration ?? 0)) },
-    { title: '🎉 Para cuando sois muchos', games: games.filter(g => maxPlayers(g) >= 6).sort((a, b) => maxPlayers(b) - maxPlayers(a)) },
-    { title: '🧠 Para pensar a fondo', games: games.filter(g => (g.weight ?? 0) >= 4).sort((a, b) => (b.weight ?? 0) - (a.weight ?? 0)) },
+    { title: 'Vuestros favoritos', icon: 'star', games: games.filter(g => avg(g) >= 7).sort((a, b) => avg(b) - avg(a)) },
+    { title: 'Para una partida rápida', icon: 'bolt', games: games.filter(g => g.duration && g.duration <= 30).sort((a, b) => (a.duration ?? 0) - (b.duration ?? 0)) },
+    { title: 'Para cuando sois muchos', icon: 'players', games: games.filter(g => maxPlayers(g) >= 6).sort((a, b) => maxPlayers(b) - maxPlayers(a)) },
+    { title: 'Para pensar a fondo', icon: 'pawn', games: games.filter(g => (g.weight ?? 0) >= 4).sort((a, b) => (b.weight ?? 0) - (a.weight ?? 0)) },
   ];
-  if (hasPlays) shelves.push({ title: '📦 Sin estrenar', games: games.filter(g => !stats.has(nameKey(g.name))).sort(byName) });
+  if (hasPlays) shelves.push({ title: 'Sin estrenar', icon: 'box', games: games.filter(g => !stats.has(nameKey(g.name))).sort(byName) });
   return shelves.filter(shelf => shelf.games.length > 1);
 }

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Icon from '../components/Icon.svelte';
   import MeepleToken from '../components/MeepleToken.svelte';
   import EmptyState from '../components/EmptyState.svelte';
   import CatalogSuggest from '../components/CatalogSuggest.svelte';
@@ -92,7 +93,7 @@
         {@const url = safeHttpUrl(game.url)}
         <article class="card">
           <div class="cardtop">
-            <div class="emoji">🛒</div>
+            <div class="emoji"><Icon name="cart" /></div>
             <div><h3>{game.title}</h3><div class="sub">{game.publisher ? game.publisher + ' · ' : ''}{game.players ? game.players + ' jugadores · ' : ''}{game.duration ?? ''}</div></div>
           </div>
           {#if game.description}<p class="details">{game.description}</p>{/if}

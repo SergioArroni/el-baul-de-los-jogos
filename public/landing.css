@@ -107,3 +107,4 @@ body { background: var(--bg); font-family: var(--font-body); }
 @media (max-width: 420px) {
   .phone { width: 250px; height: 520px; }
 }
+.land-brand .logo-shape { display: block; width: 72%; height: 72%; background: currentColor; -webkit-mask: url(/brand/baul-icono.png) center/contain no-repeat; mask: url(/brand/baul-icono.png) center/contain no-repeat; }

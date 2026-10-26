@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Icon, { type IconName } from '../components/Icon.svelte';
   import Modal from '../components/Modal.svelte';
   import { coverUrl, findInLibrary } from '../content/library';
   import { gameArt } from '../domain/art';
@@ -27,11 +28,11 @@
   const realMinutes = $derived(game ? realDuration(app.plays, game.name) : null);
   const canPlay = $derived(!!app.user && !app.playsMissing);
   const facts = $derived(game ? [
-    `👥 ${game.players || 'Jugadores por confirmar'}`,
-    game.duration ? `⏱ ${game.duration} min` : '⏱ Duración por confirmar',
-    game.weight ? `Dureza ${game.weight}/5` : 'Dureza por confirmar',
-    `📍 ${game.locations.join(' · ') || 'Lugar por asignar'}`,
-  ] : []);
+    { icon: 'players', text: game.players || 'Jugadores por confirmar' },
+    { icon: 'clock', text: game.duration ? `${game.duration} min` : 'Duración por confirmar' },
+    { icon: 'pawn', text: game.weight ? `Dureza ${game.weight}/5` : 'Dureza por confirmar' },
+    { icon: 'pin', text: game.locations.join(' · ') || 'Lugar por asignar' },
+  ] satisfies { icon: IconName; text: string }[] : []);
 </script>
 
 <Modal open={!!game} title={game?.name ?? ''} {onclose} dialogClass="detail-dialog" labelId="detailTitle">
@@ -41,7 +42,7 @@
         <img class="cover-art hero-blur" src={coverUrl(entry)} alt="" />
         <img class="hero-art" src={coverUrl(entry)} alt="" />
       {:else}
-        <span class="cover-emoji" aria-hidden="true">{art?.emoji}</span>
+        <span class="cover-emoji" aria-hidden="true">{#if art}<Icon name={art.icon} size="1em" />{/if}</span>
       {/if}
       <button class="x" type="button" aria-label="Cerrar" onclick={onclose}>×</button>
     </div>
@@ -49,9 +50,9 @@
   {#if game}
     <div class="detail-body">
       <h2 id="detailTitle">{game.name}</h2>
-      {#if realMinutes}<p class="real-time">⏱ {game.duration ? `${game.duration} min en la caja · ` : ''}<strong>{realMinutes} min de verdad</strong></p>{/if}
+      {#if realMinutes}<p class="real-time"><Icon name="clock" /> {game.duration ? `${game.duration} min en la caja · ` : ''}<strong>{realMinutes} min de verdad</strong></p>{/if}
       <div class="tags">
-        {#each facts as fact (fact)}<span class="tag">{fact}</span>{/each}
+        {#each facts as fact (fact.icon)}<span class="tag"><Icon name={fact.icon} /> {fact.text}</span>{/each}
         {#each game.types as type (type)}<span class="tag green">{type}</span>{/each}
       </div>
       {#if game.notes}<p class="details">{game.notes}</p>{/if}
@@ -63,7 +64,7 @@
           <p><strong>Cómo va la partida</strong></p>
           <ol>{#each rules.turn as step (step)}<li>{step}</li>{/each}</ol>
           <p><strong>Final.</strong> {rules.end}</p>
-          {#if rules.tip}<p class="how-to-tip">💡 {rules.tip}</p>{/if}
+          {#if rules.tip}<p class="how-to-tip"><Icon name="bulb" /> {rules.tip}</p>{/if}
           {#if rules.caveat}<p class="notice">{rules.caveat}</p>{/if}
         </section>
       {:else if entry}

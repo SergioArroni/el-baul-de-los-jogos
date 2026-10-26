@@ -2,7 +2,8 @@
   import { untrack } from 'svelte';
   import EmptyState from '../components/EmptyState.svelte';
   import GameCover from '../components/GameCover.svelte';
-  import { typeEmoji } from '../domain/art';
+  import Icon from '../components/Icon.svelte';
+  import { typeIcon } from '../domain/art';
   import { buildShelves, byName, filterGames, noFilters, topTypes, type CatalogFilters } from '../domain/catalog';
   import type { Game } from '../domain/types';
   import { deal, flipList } from '../motion';
@@ -80,7 +81,7 @@
     <button type="button" class="type-chip" aria-pressed={!filters.type} onclick={() => (filters.type = '')}>Todos</button>
     {#each types as type (type)}
       <button type="button" class="type-chip" aria-pressed={filters.type === type} onclick={() => (filters.type = filters.type === type ? '' : type)}>
-        {typeEmoji(type)} {type}
+        {#if typeIcon(type)}<Icon name={typeIcon(type)!} />{/if} {type}
       </button>
     {/each}
   </div>
@@ -102,7 +103,7 @@
   {:else}
     {#each shelves as shelf (shelf.title)}
       <section class="shelf">
-        <div class="shelf-head"><h2>{shelf.title}</h2><span>{shelf.games.length}</span></div>
+        <div class="shelf-head"><h2><Icon name={shelf.icon} /> {shelf.title}</h2><span>{shelf.games.length}</span></div>
         <div class="shelf-row" use:deal={{ once: "shelf:" + shelf.title, limit: 8 }}>{#each shelf.games as game (game.id)}<GameCover {game} onopen={g => (detail = g)} />{/each}</div>
       </section>
     {/each}

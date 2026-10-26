@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Icon from '../components/Icon.svelte';
   import { countUp } from '../motion';
   import EmptyState from '../components/EmptyState.svelte';
   import Avatar from '../components/Avatar.svelte';
@@ -69,7 +70,7 @@
           {@const last = entry.plays[0]}
           {@const top = playStats(entry.plays).mostPlayed}
           <article class="groupcard">
-            <h3>👥 {entry.name}</h3>
+            <h3><Icon name="players" /> {entry.name}</h3>
             <p>{entry.plays.length} {entry.plays.length === 1 ? 'partida' : 'partidas'}{#if last} · Última: {last.game_name} ({formatDate(last.played_on)}){/if}</p>
             {#if top && top.count > 1}<div class="tags"><span class="tag green">Más jugado: {top.name}</span></div>{/if}
             <div class="actions"><button class="btn secondary" onclick={() => (app.playView = entry.key)}>{entry.plays.length ? 'Ver partidas' : 'Abrir grupo'}</button></div>
@@ -112,12 +113,12 @@
           {@const myRow = play.play_players.find(x => x.user_id === me)}
           {@const avg = average(play)}
           <article class="card">
-            <div class="cardtop"><div class="emoji">🎲</div><div><h3>{play.game_name}</h3><div class="sub">{formatDate(play.played_on)}{play.place ? ' · 📍 ' + play.place : ''}</div></div></div>
+            <div class="cardtop"><div class="emoji"><Icon name="dice" /></div><div><h3>{play.game_name}</h3><div class="sub">{formatDate(play.played_on)}{#if play.place} · <Icon name="pin" /> {play.place}{/if}</div></div></div>
             <ul class="play-players">
               {#each sortedPlayers(play) as player (player.id)}
                 <li>
                   <Avatar userId={player.user_id} name={player.name} size="tiny" />
-                  <span class="play-name">{who(player)}{player.winner ? ' 🏆' : ''}</span>
+                  <span class="play-name">{who(player)}{#if player.winner} <Icon name="trophy" label="ganó" />{/if}</span>
                   {#if player.points != null}<span class="play-points">{Number(player.points).toLocaleString('es-ES')} pts</span>{/if}
                   {#if player.rating}<span class="play-rating">★ {player.rating}</span>{/if}
                 </li>

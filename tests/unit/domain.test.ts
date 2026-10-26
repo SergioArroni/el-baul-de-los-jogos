@@ -90,8 +90,8 @@ describe('stats', () => {
 describe('art', () => {
   it('is stable for the same game and follows the main style', () => {
     expect(gameArt({ name: 'Trio', types: ['Cartas'] })).toEqual(gameArt({ name: 'Trio', types: ['Cartas'] }));
-    expect(gameArt({ name: 'X', types: ['Fiesta', 'Roles ocultos'] }).emoji).toBe('🕵️');
-    expect(gameArt({ name: 'X', types: ['Desconocido'] }).emoji).toBe('🎲');
+    expect(gameArt({ name: 'X', types: ['Fiesta', 'Roles ocultos'] }).icon).toBe('mask');
+    expect(gameArt({ name: 'X', types: ['Desconocido'] }).icon).toBe('dice');
   });
 });
 
@@ -132,10 +132,10 @@ describe('catalog', () => {
   it('builds themed shelves and skips the ones with a single game', () => {
     const shelves = buildShelves(games, playStats([play({ game_name: 'Zombis' })]).games, true);
     const titles = shelves.map(s => s.title);
-    expect(titles).toContain('⚡ Para una partida rápida');
-    expect(titles).toContain('🧠 Para pensar a fondo');
-    expect(titles).toContain('📦 Sin estrenar');
-    expect(titles).not.toContain('⭐ Vuestros favoritos');
+    expect(titles).toContain('Para una partida rápida');
+    expect(titles).toContain('Para pensar a fondo');
+    expect(titles).toContain('Sin estrenar');
+    expect(titles).not.toContain('Vuestros favoritos');
   });
 });
 

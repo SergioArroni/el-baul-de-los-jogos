@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Icon from '../components/Icon.svelte';
   import { coverUrl, findInLibrary } from '../content/library';
   import EmptyState from '../components/EmptyState.svelte';
   import GameCover from '../components/GameCover.svelte';
@@ -113,7 +114,7 @@
                 <GameCover {game} onopen={g => (detail = g)} />
                 {#if groupNote}<span class="reco-note">{groupNote}</span>{/if}
                 {#each reasons as reason (reason)}<span class="reco-reason">✦ {reason}</span>{/each}
-                <span class="reco-place">📍 {game.locations.join(' · ') || 'Lugar por asignar'}</span>
+                <span class="reco-place"><Icon name="pin" /> {game.locations.join(' · ') || 'Lugar por asignar'}</span>
               </li>
             {/each}
           </ol>
@@ -130,7 +131,7 @@
           {#each outside as pick (pick.name)}
             {@const entry = findInLibrary(pick.name)}
             <li>
-              {#if entry}<img src={coverUrl(entry)} alt="" loading="lazy" />{:else}<span class="outside-dice" aria-hidden="true">🎲</span>{/if}
+              {#if entry}<img src={coverUrl(entry)} alt="" loading="lazy" />{:else}<span class="outside-dice" aria-hidden="true"><Icon name="dice" /></span>{/if}
               <strong>{pick.name}</strong>
               <span>★ {formatDecimal(pick.predicted)} para ti · {pick.neighbours} personas parecidas</span>
             </li>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Icon from '../components/Icon.svelte';
   import { tick } from 'svelte';
   import { coverUrl, type LibraryEntry } from '../content/library';
   import { flipList, gsap, prefersReducedMotion } from '../motion';
@@ -79,7 +80,7 @@
       Toca una carta para ver de qué va.
     {/if}
   </p>
-  <button class="btn" type="button" onclick={shuffle}>🔀 Barajar</button>
+  <button class="btn" type="button" onclick={shuffle}><Icon name="shuffle" /> Barajar</button>
 </div>
 
 <style>

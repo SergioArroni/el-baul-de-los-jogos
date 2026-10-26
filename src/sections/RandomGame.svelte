@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Icon from '../components/Icon.svelte';
   import { tick } from 'svelte';
   import GameCover from '../components/GameCover.svelte';
   import { drawGame, randomCandidates } from '../domain/random';
@@ -35,7 +36,7 @@
 </script>
 
 <div class="card random-card">
-  <div class="random-head"><h3>🎲 Juego al azar</h3><p>¿No os decidís? Que decida el dado.</p></div>
+  <div class="random-head"><h3><Icon name="dice" /> Juego al azar</h3><p>¿No os decidís? Que decida el dado.</p></div>
   <div class="formgrid">
     <div class="field">
       <label for="randomPlace">¿Dónde estáis?</label>
@@ -59,6 +60,6 @@
   <p class="notice" role="status">{status}</p>
   <div class="random-actions">
     <small>{pool.length} {pool.length === 1 ? 'juego encaja' : 'juegos encajan'}</small>
-    <button class="btn" type="button" onclick={roll} disabled={!pool.length}>{picked ? '🎲 Otro' : '🎲 Tirar el dado'}</button>
+    <button class="btn" type="button" onclick={roll} disabled={!pool.length}><Icon name="dice" /> {picked ? 'Otro' : 'Tirar el dado'}</button>
   </div>
 </div>

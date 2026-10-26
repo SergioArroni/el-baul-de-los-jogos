@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Icon from '../components/Icon.svelte';
   import { untrack } from 'svelte';
   import EmptyState from '../components/EmptyState.svelte';
   import { coverUrl, findInLibrary } from '../content/library';
@@ -40,7 +41,6 @@
     return global ?? [];
   });
   const ranked = $derived(bayesianRanking(rows));
-  const medal = (i: number) => ['🥇', '🥈', '🥉'][i] ?? String(i + 1);
   const ratings = (n: number) => `${n} ${n === 1 ? 'nota' : 'notas'}`;
 
   const empty = $derived(
@@ -80,8 +80,8 @@
           {#each ranked as row, i (row.name)}
             {@const entry = findInLibrary(row.name)}
             <li class="ranking-row" class:podium={i < 3}>
-              <span class="rank">{medal(i)}</span>
-              {#if entry}<img class="rank-cover" src={coverUrl(entry)} alt="" loading="lazy" />{:else}<span class="rank-cover rank-cover-empty" aria-hidden="true">🎲</span>{/if}
+              <span class="rank" class:medal={i < 3} data-place={i + 1}>{i + 1}</span>
+              {#if entry}<img class="rank-cover" src={coverUrl(entry)} alt="" loading="lazy" />{:else}<span class="rank-cover rank-cover-empty" aria-hidden="true"><Icon name="dice" /></span>{/if}
               <div class="rank-info">
                 <strong>{row.name}</strong>
                 <span>{ratings(row.count)}{view !== 'mine' ? ` · ${row.people} ${row.people === 1 ? 'persona' : 'personas'}` : ''}</span>

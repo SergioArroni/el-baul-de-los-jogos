@@ -1,0 +1,30 @@
+// The app's own icons: single-colour line drawings that take the text colour (currentColor),
+// like the tab bar's glyphs, instead of the system's colour emoji.
+export const ICONS = {
+  bolt: '<path d="M13 2.5 4.5 13.5h6.5l-1 8 8.5-11h-6.5z"/>',
+  players: '<circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5M15.5 5.2a3 3 0 0 1 0 5.6M17.5 14.3c1.7.7 2.7 2.2 3 4.7"/>',
+  clock: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+  pin: '<path d="M12 21s-6.5-6-6.5-11a6.5 6.5 0 0 1 13 0c0 5-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/>',
+  star: '<path d="m12 3.5 2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.8l-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z"/>',
+  box: '<path d="M3.5 7.5 12 3l8.5 4.5v9L12 21l-8.5-4.5zM3.5 7.5 12 12l8.5-4.5M12 12v9"/>',
+  pawn: '<circle cx="12" cy="6.8" r="2.6"/><path d="M9.6 11.2h4.8l-.9 4.3h-3zM7.5 20h9l-1.4-4.5H8.9z"/>',
+  party: '<path d="m4 20 4.5-11 6.5 6.5zM14 3.5v2M20 9.5h-2M18.3 5.2 16.8 6.7M11.2 7.8c1-1 1-2.6 0-3.6M16.2 13c1-1 2.6-1 3.6 0"/>',
+  rings: '<circle cx="9" cy="12" r="4.8"/><circle cx="15" cy="12" r="4.8"/>',
+  swords: '<path d="m4 4 9.5 9.5M4 4h3.5L15 11.5M20 4l-9.5 9.5M20 4h-3.5L9 11.5M7 14.5l-3 3 2.5 2.5 3-3M17 14.5l3 3-2.5 2.5-3-3"/>',
+  map: '<path d="M3.5 6.5 9 4l6 2.5L20.5 4v13.5L15 20l-6-2.5L3.5 20zM9 4v13.5M15 6.5V20"/>',
+  cards: '<rect x="4" y="6" width="10.5" height="14" rx="2"/><path d="m10 4.3 7.3 1.2c1 .2 1.7 1.2 1.5 2.2l-1.9 11.6"/>',
+  search: '<circle cx="10.5" cy="10.5" r="6"/><path d="m15 15 5.5 5.5"/>',
+  letters: '<path d="m3.5 18.5 4.5-13 4.5 13M5.2 14h5.6M15 12.2a2.6 2.6 0 0 1 5 1v5.3M20 15.2c-3.2-.4-5.3.4-5.3 1.9 0 2 3.4 2 5.3-.2"/>',
+  house: '<path d="M4 11.5 12 5l8 6.5M6.5 10v9.5h11V10M10 19.5v-5h4v5"/>',
+  laugh: '<circle cx="12" cy="12" r="8.5"/><path d="M8 13.5c.9 2.2 2.3 3.3 4 3.3s3.1-1.1 4-3.3z"/><circle cx="9" cy="9.5" r="1.1" fill="currentColor"/><circle cx="15" cy="9.5" r="1.1" fill="currentColor"/>',
+  mask: '<path d="M3.5 7.8c3.2-1.6 13.8-1.6 17 0 0 5.2-3 9.2-8.5 9.2S3.5 13 3.5 7.8zM7.8 11h2.6M13.6 11h2.6"/>',
+  dice: '<rect x="4" y="4" width="16" height="16" rx="3.5"/><circle cx="8.6" cy="8.6" r="1.25" fill="currentColor"/><circle cx="15.4" cy="8.6" r="1.25" fill="currentColor"/><circle cx="12" cy="12" r="1.25" fill="currentColor"/><circle cx="8.6" cy="15.4" r="1.25" fill="currentColor"/><circle cx="15.4" cy="15.4" r="1.25" fill="currentColor"/>',
+  trophy: '<path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H5.2a3 3 0 0 0 3 4.2M16 6h2.8a3 3 0 0 1-3 4.2M12 13v4M8.5 20.5h7M10 17h4"/>',
+  cart: '<path d="M3 4.5h2.2l2.1 10.3h10.4l2.2-7.3H6.3"/><circle cx="9" cy="19" r="1.4"/><circle cx="17" cy="19" r="1.4"/>',
+  shuffle: '<path d="M4 7h3.5c2 0 3 1 4.2 3l1.6 4c1.2 2 2.2 3 4.2 3H20M4 17h3.5c1.2 0 2-.4 2.7-1.2M13.8 8.2c.7-.8 1.5-1.2 2.7-1.2H20M17.5 4.5 20 7l-2.5 2.5M17.5 14.5 20 17l-2.5 2.5"/>',
+  bulb: '<path d="M9 17h6M10 20.5h4M12 3.5a5.5 5.5 0 0 0-3.2 10c.5.4.7 1 .7 1.5V17h5v-2c0-.5.2-1.1.7-1.5A5.5 5.5 0 0 0 12 3.5z"/>',
+  layers: '<path d="M12 3.5 3.5 8 12 12.5 20.5 8zM3.5 12 12 16.5l8.5-4.5M3.5 16 12 20.5l8.5-4.5"/>',
+  flag: '<path d="M5.5 21V4M5.5 4.5h11l-2 4 2 4h-11"/>',
+} as const;
+
+export type IconName = keyof typeof ICONS;

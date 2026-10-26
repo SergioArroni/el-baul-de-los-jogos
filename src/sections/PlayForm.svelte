@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Icon from '../components/Icon.svelte';
   import Avatar from '../components/Avatar.svelte';
   import Modal from '../components/Modal.svelte';
   import { deletePlay, savePlay, type PlayerDraft } from '../data/plays';
@@ -186,7 +187,7 @@
               <span class="play-score-name"><Avatar userId={player.userId} name={player.name} size="tiny" />{label(player)}</span>
               <input type="number" step="any" inputmode="decimal" placeholder="Pts" aria-label="Puntos de {player.name}"
                 value={player.points ?? ''} oninput={e => (player.points = e.currentTarget.value === '' ? null : Number(e.currentTarget.value))} />
-              <label class="winner-toggle" title="Ganó"><input type="checkbox" bind:checked={player.winner} />🏆<span class="visually-hidden">Ganó {player.name}</span></label>
+              <label class="winner-toggle" title="Ganó"><input type="checkbox" bind:checked={player.winner} /><Icon name="trophy" /><span class="visually-hidden">Ganó {player.name}</span></label>
               {#if isMe(player.userId)}
                 <select aria-label="Tu nota" value={player.rating ?? ''} onchange={e => (player.rating = e.currentTarget.value ? Number(e.currentTarget.value) : null)}>
                   <option value="">Nota</option>

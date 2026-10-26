@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Icon from '../components/Icon.svelte';
   import Modal from '../components/Modal.svelte';
   import { nameKey } from '../domain/text';
   import { app, uid } from '../stores/app.svelte';
@@ -35,7 +36,7 @@
       <thead><tr><th>Lugar</th><th>Juegos guardados</th></tr></thead>
       <tbody>
         {#each app.places as place (place.id)}
-          <tr><td><strong>📍 {place.name}</strong></td><td>{app.games.filter(game => game.locations.includes(place.name)).length}</td></tr>
+          <tr><td><strong><Icon name="pin" /> {place.name}</strong></td><td>{app.games.filter(game => game.locations.includes(place.name)).length}</td></tr>
         {:else}
           <tr><td colspan="2">Todavía no hay lugares.</td></tr>
         {/each}

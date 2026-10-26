@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Icon from '../components/Icon.svelte';
   import Avatar from '../components/Avatar.svelte';
   import EmptyState from '../components/EmptyState.svelte';
   import { searchPeople, type PersonSummary } from '../data/people';
@@ -151,7 +152,7 @@
       {#each app.groups as group (app.groupKey(group))}
         {@const members = groupMembers(group, app.friends)}
         <article class="groupcard">
-          <h3>👥 {group.name}</h3>
+          <h3><Icon name="players" /> {group.name}</h3>
           {#if group._shared}<p>Compartido por @{app.people.get(group._ownerId ?? '')?.nickname ?? 'otra cuenta'}</p>{/if}
           {#if members.length}
             <div class="member-row">

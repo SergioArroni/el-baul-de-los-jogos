@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Icon from './Icon.svelte';
   import { coverUrl, findInLibrary } from '../content/library';
   import { gameArt } from '../domain/art';
   import { averageRating } from '../domain/stats';
@@ -17,10 +18,10 @@
 <button type="button" class="cover pattern-{art.pattern}" style:--c1={art.from} style:--c2={art.to} onclick={event => { rememberOrigin(event.currentTarget); onopen(game); }}>
   {#if entry}<img class="cover-art" src={coverUrl(entry)} alt="" loading="lazy" />{/if}
   <span class="cover-meta">
-    <span>👥 {game.players || '?'}</span>
-    {#if game.duration}<span>⏱ {game.duration}′</span>{/if}
+    <span><Icon name="players" /> {game.players || '?'}</span>
+    {#if game.duration}<span><Icon name="clock" /> {game.duration}′</span>{/if}
   </span>
-  {#if !entry}<span class="cover-emoji" aria-hidden="true">{art.emoji}</span>{/if}
+  {#if !entry}<span class="cover-emoji" aria-hidden="true"><Icon name={art.icon} size="1em" /></span>{/if}
   <span>
     <span class="cover-title">{game.name}</span>
     <span class="cover-foot">

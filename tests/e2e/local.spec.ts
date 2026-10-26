@@ -15,8 +15,8 @@ test.beforeEach(async ({ page }) => {
 const covers = (page: Page) => page.locator('.cover-grid .cover');
 
 test('catalog shows themed shelves and the whole collection', async ({ page }) => {
-  await expect(page.getByRole('heading', { name: '⚡ Para una partida rápida' })).toBeVisible();
-  await expect(page.getByRole('heading', { name: '🎉 Para cuando sois muchos' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Para una partida rápida' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Para cuando sois muchos' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Toda la colección' })).toBeVisible();
   await expect(covers(page)).toHaveCount(42);
 });
@@ -79,7 +79,7 @@ test('places can be added once', async ({ page }) => {
   await expect(page.getByText('Ya existe un lugar con ese nombre.')).toBeVisible();
   await page.getByLabel('Nombre del lugar *').fill('Bar Tablero');
   await page.getByRole('button', { name: 'Guardar lugar' }).click();
-  await expect(page.getByRole('cell', { name: '📍 Bar Tablero' })).toBeVisible();
+  await expect(page.getByRole('cell', { name: 'Bar Tablero' })).toBeVisible();
 });
 
 test('recommendations fit the number of players and the plan', async ({ page }) => {
@@ -140,7 +140,7 @@ test('a game can be in several places at once', async ({ page }) => {
   await page.getByRole('button', { name: 'Guardar juego' }).click();
 
   await covers(page).first().click();
-  await expect(page.getByRole('dialog')).toContainText('📍 Casa Sergio · Casa Lu');
+  await expect(page.getByRole('dialog')).toContainText('Casa Sergio · Casa Lu');
   await page.getByRole('dialog').getByRole('button', { name: 'Cerrar' }).click();
   await page.getByLabel('Buscar en la colección').fill('');
   await page.getByLabel('Filtrar lugar').selectOption('Casa Lu');
@@ -150,9 +150,9 @@ test('a game can be in several places at once', async ({ page }) => {
 test('the dice picks a random game that fits, without repeating', async ({ page }) => {
   await page.getByRole('navigation').getByRole('button', { name: /Qué jugamos/ }).click();
   await page.getByLabel('¿Dónde estáis?').selectOption('Casa Sergio');
-  await page.getByRole('button', { name: '🎲 Tirar el dado' }).click();
+  await page.getByRole('button', { name: 'Tirar el dado' }).click();
   const first = await page.locator('.random-pick .cover-title').innerText();
-  await page.getByRole('button', { name: '🎲 Otro' }).click();
+  await page.getByRole('button', { name: 'Otro' }).click();
   await expect(page.locator('.random-pick .cover-title')).not.toHaveText(first);
 });
 
