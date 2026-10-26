@@ -73,10 +73,6 @@ body { background: var(--bg); font-family: var(--font-body); }
 .steps h3 { margin: 16px 0 6px; font: 600 1.3rem/1.2 var(--font-display); }
 .steps p { margin: 0; color: var(--muted); }
 
-.quotes { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; max-width: 1040px; margin: 0 auto; padding: 0 16px 80px; }
-.quotes figure { margin: 0; padding: 24px; border-radius: var(--radius-lg); background: var(--paper); border: 1px solid var(--line); }
-.quotes blockquote { margin: 0; font: 600 1.15rem/1.45 var(--font-display); }
-.quotes figcaption { margin-top: 12px; color: var(--muted); }
 
 .faq { padding: 0 16px clamp(70px, 10vw, 120px); }
 .faq-list { max-width: 760px; margin: 34px auto 0; display: grid; gap: 10px; }

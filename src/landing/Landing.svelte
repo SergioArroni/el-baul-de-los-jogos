@@ -36,9 +36,6 @@
     { q: '¿Puedo borrar mi cuenta?', a: 'Sí, cuando quieras, desde «Mi perfil». Se borra al momento, con tus datos.' },
   ];
 
-  /** Real quotes from friends, with their permission. The section stays hidden while empty. */
-  const quotes: { text: string; who: string }[] = [];
-
   let active = $state('coleccion');
   let problem: HTMLElement;
   let featureList: HTMLElement;
@@ -174,12 +171,6 @@
       <li use:reveal={{ delay: 0.2 }}><span>3</span><h3>Invita a tus amigos</h3><p>Montad vuestros grupos y empezad a apuntar partidas.</p></li>
     </ol>
   </section>
-
-  {#if quotes.length}
-    <section class="quotes" aria-label="Lo que dicen">
-      {#each quotes as quote (quote.who)}<figure use:reveal><blockquote>«{quote.text}»</blockquote><figcaption>{quote.who}</figcaption></figure>{/each}
-    </section>
-  {/if}
 
   <section class="faq" aria-labelledby="faqTitle">
     <h2 id="faqTitle" class="section-title" use:splitReveal>Preguntas frecuentes</h2>

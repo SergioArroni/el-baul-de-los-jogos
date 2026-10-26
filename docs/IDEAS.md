@@ -10,7 +10,6 @@ Al terminarla, se borra de aquí.
 - **Ejecutar en Supabase**, en orden: `sql/wishlist-meeples.sql`, `sql/plays-duration.sql`,
   `sql/ranking.sql`, `sql/google-login.sql`, `sql/similar-taste.sql` y `sql/catalog.sql`.
 - **Activar Google** en Google Cloud y Supabase (`docs/GOOGLE-LOGIN.md`), incluida la URL de la APK.
-- **Frases reales de amigos** para la landing, con su permiso.
 - **Reglas de 7 juegos** sin explicación fiable: Game Off, ¿Alguien ha probado este juego?,
   La Vacuna Española, El Cubilete, el juego de beber, Codex y Brink.
 - **Catálogo BGG**: programado; falta registrar la app en BGG, el token y `sql/catalog.sql` (`docs/BGG.md`).
