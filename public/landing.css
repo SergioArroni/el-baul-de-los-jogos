@@ -24,7 +24,6 @@ body { background: var(--bg); font-family: var(--font-body); }
 .problem { padding: clamp(80px, 12vw, 140px) 0 60px; overflow: hidden; }
 .problem p { color: var(--muted); font-size: 1.12rem; }
 .scatter { width: min(100% - 32px, 920px); margin: 46px auto 0; display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; }
-.scatter-card { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; border: 3px solid #fffefa; border-radius: 12px; box-shadow: var(--card-shadow); }
 
 .features { padding: clamp(60px, 9vw, 110px) clamp(16px, 5vw, 72px); }
 .features-layout { display: grid; grid-template-columns: minmax(280px, 380px) 1fr; gap: clamp(30px, 6vw, 90px); max-width: 1120px; margin: 50px auto 0; }

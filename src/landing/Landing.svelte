@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import CardFan from '../components/CardFan.svelte';
+  import CardTable from './CardTable.svelte';
   import { coverUrl, LIBRARY } from '../content/library';
   import { CONTACT_EMAIL } from '../content/legal';
   import { countUp, gsap, prefersReducedMotion, reveal } from '../motion';
@@ -11,7 +12,7 @@
   const SIGNUP = '/login.html?signup=1';
   const LOGIN = '/login.html';
 
-  /** Covers that start scattered "in four houses" and end up neatly in the box. */
+  /** Covers that start scattered "in four houses", end up neatly on the table and can be turned over. */
   const scattered = ['7-wonders', 'azul', 'virus', 'dominion', 'hanabi', 'scythe', 'just-one', 'carcassonne', 'mysterium', 'codigo-secreto', 'sushi-go', 'la-tripulacion']
     .map(slug => LIBRARY.find(entry => entry.slug === slug))
     .filter(entry => !!entry);
@@ -130,9 +131,7 @@
       <h2 id="problemTitle" use:splitReveal>Tenéis 50 juegos repartidos en 4 casas… y siempre acabáis jugando al mismo.</h2>
       <p use:reveal>¿Dónde estaba el Catan? ¿Cómo se jugaba a esto? ¿Quién ganó la última vez? El Baúl lo recuerda por vosotros.</p>
     </div>
-    <div class="scatter" aria-hidden="true">
-      {#each scattered as entry (entry.slug)}<img class="scatter-card" src={coverUrl(entry)} alt="" loading="lazy" />{/each}
-    </div>
+    <CardTable entries={scattered} signup={SIGNUP} />
   </section>
 
   <section class="features" aria-labelledby="featuresTitle">

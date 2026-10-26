@@ -34,3 +34,26 @@ test('the landing fits a phone without sideways scrolling', async ({ page }) => 
   await page.goto('/inicio');
   expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(0);
 });
+
+test('the cards on the table turn over to say what each game is about, and shuffle', async ({ page }) => {
+  await page.goto('/inicio');
+  const hanabi = page.getByRole('button', { name: 'Hanabi: ver de qué va' });
+  await hanabi.click();
+  await expect(page.getByRole('button', { name: 'Hanabi: tapar la carta' })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('.table-caption')).toContainText('fuegos artificiales');
+  await expect(page.locator('.table-caption').getByRole('link', { name: 'Ver cómo se juega' })).toHaveAttribute('href', /signup=1/);
+
+  const order = () => page.locator('.scatter-card').evaluateAll(cards => cards.map(card => card.getAttribute('aria-label')).join());
+  const before = await order();
+  // Twelve cards: a shuffle that leaves them all in place is too unlikely to matter, but try twice.
+  await page.getByRole('button', { name: /Barajar/ }).click();
+  if ((await order()) === before) await page.getByRole('button', { name: /Barajar/ }).click();
+  expect(await order()).not.toBe(before);
+  await expect(page.getByRole('button', { name: 'Hanabi: tapar la carta' })).toBeVisible();
+});
+
+test('the footer links to the privacy policy and the contact address', async ({ page }) => {
+  await page.goto('/inicio');
+  await expect(page.getByRole('link', { name: 'Privacidad' })).toHaveAttribute('href', '/privacidad');
+  await expect(page.getByRole('link', { name: 'Contacto' })).toHaveAttribute('href', 'mailto:elbauldelosjogos@gmail.com');
+});

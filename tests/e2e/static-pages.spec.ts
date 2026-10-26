@@ -50,9 +50,10 @@ test('"Entrar con Google" only shows when Supabase has Google enabled', async ({
   await expect(page.getByRole('button', { name: 'Entrar con Google' })).toBeVisible();
 });
 
-test('the privacy policy is there, waiting for its contact address', async ({ page }) => {
+test('the privacy policy is there, with the contact address of the app', async ({ page }) => {
   await page.goto('/privacidad');
   await expect(page.getByRole('heading', { name: 'Política de privacidad' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'borrar tu cuenta' })).toHaveAttribute('href', '/borrar-cuenta.html');
-  await expect(page.getByText('correo pendiente de publicar').first()).toBeVisible();
+  await expect(page.getByRole('link', { name: 'elbauldelosjogos@gmail.com' }).first()).toHaveAttribute('href', 'mailto:elbauldelosjogos@gmail.com');
+  await expect(page.getByText('pendiente de publicar')).toHaveCount(0);
 });
