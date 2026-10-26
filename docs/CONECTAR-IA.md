@@ -6,6 +6,7 @@ casa de Enzo?» o «¿quién gana más al Carcassonne?». Solo puede **leer** tu
 - **Dirección del conector:** `https://el-baul-de-los-jogos.vercel.app/api/mcp`
 - **Inicio de sesión:** OAuth. Al conectar, te pedirá entrar con tu cuenta del Baúl y darle permiso.
 - **Coste:** ninguno para el Baúl; usas tu propia cuenta de Claude o ChatGPT.
+- **En la app:** «Mi perfil» → «Conectar con Claude o ChatGPT» tiene la dirección para copiar y estos pasos (o toca a Jogiño, el meeple de la esquina).
 
 ## Claude (claude.ai o la app de escritorio)
 1. Abre **Ajustes → Conectores** y pulsa **Añadir conector personalizado**.

@@ -117,5 +117,5 @@ test('the play shows in the catalog sheet and in "¿Qué jugamos?"', async ({ br
   await page.getByLabel('Grupo').selectOption({ label: 'Los Balcánicos' });
   await expect(page.getByLabel('¿Cuántas personas?')).toHaveValue('3');
   await page.getByRole('button', { name: 'Encontrar juegos' }).click();
-  await expect(page.locator('.reco .card').first()).toContainText('Nota del grupo: 8,5/10');
+  await expect(page.locator('.reco-pick').first()).toContainText('Nota del grupo: 8,5/10');
 });

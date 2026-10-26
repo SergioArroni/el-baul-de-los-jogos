@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import CardFan from '../components/CardFan.svelte';
   import CardTable from './CardTable.svelte';
+  import JoginoBuddy from '../mascot/JoginoBuddy.svelte';
   import { coverUrl, LIBRARY } from '../content/library';
   import { CONTACT_EMAIL } from '../content/legal';
   import { countUp, gsap, prefersReducedMotion, reveal } from '../motion';
@@ -196,3 +197,8 @@
     {#if CONTACT_EMAIL}<a href="/privacidad">Privacidad</a><a href="mailto:{CONTACT_EMAIL}">Contacto</a>{/if}
   </nav>
 </footer>
+
+<JoginoBuddy
+  text="Si usas Claude o ChatGPT, te contesto desde ahí: «¿a qué jugamos esta noche?». Primero, crea tu cuenta del Baúl."
+  action={{ label: 'Crear cuenta gratis', href: SIGNUP }}
+/>

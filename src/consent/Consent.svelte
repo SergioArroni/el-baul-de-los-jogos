@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import CardFan from '../components/CardFan.svelte';
+  import Jogino from '../mascot/Jogino.svelte';
   import { supabase } from '../data/client';
 
   // Supabase sends the person here (Site URL + /oauth/consent) when an app such as
@@ -49,7 +49,11 @@
 </script>
 
 <main class="consent grain">
-  <div class="consent-fan"><CardFan width={92} slugs={['hanabi', 'azul', 'carcassonne', 'mysterium', 'sushi-go']} /></div>
+  <!-- Jogiño at the door, holding the pass: "may I let them in?" -->
+  <div class="consent-jogino">
+    {#if request}<span class="consent-say" aria-hidden="true">¿Le dejo pasar?</span>{/if}
+    <span class="consent-figure"><Jogino pose={request ? 'permiso' : 'idle'} /></span>
+  </div>
   <section class="consent-card" aria-labelledby="consentTitle">
     {#if request}
       <p class="eyebrow">Conectar con El Baúl de los Jogos</p>

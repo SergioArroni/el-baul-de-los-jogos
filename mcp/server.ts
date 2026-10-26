@@ -58,10 +58,24 @@ function findGroup(groups: Group[], name: string): Group {
   return group;
 }
 
+/** The public site, where the connector's icon lives. */
+const SITE = 'https://el-baul-de-los-jogos.vercel.app';
+
 /** One MCP server per request: the tools close over that caller's data port. */
 export function buildServer(data: BaulData): McpServer {
   const server = new McpServer(
-    { name: 'el-baul-de-los-jogos', version: '0.2.0', title: 'El Baúl de los Jogos' },
+    {
+      name: 'el-baul-de-los-jogos',
+      version: '0.2.0',
+      title: 'El Baúl de los Jogos',
+      websiteUrl: SITE,
+      // Jogiño, shown by Claude or ChatGPT next to the connector.
+      icons: [
+        { src: `${SITE}/brand/jogino-icon.svg`, mimeType: 'image/svg+xml' },
+        { src: `${SITE}/brand/jogino-icon-512.png`, mimeType: 'image/png', sizes: ['512x512'] },
+        { src: `${SITE}/brand/jogino-icon-192.png`, mimeType: 'image/png', sizes: ['192x192'] },
+      ],
+    },
     {
       instructions:
         'Herramientas de El Baúl de los Jogos, la colección de juegos de mesa del usuario, sus grupos de amigos y sus partidas. ' +

@@ -1,5 +1,6 @@
 <script lang="ts">
   import Avatar from '../components/Avatar.svelte';
+  import EmptyState from '../components/EmptyState.svelte';
   import { searchPeople, type PersonSummary } from '../data/people';
   import { dismissFriendRequest } from '../data/social';
   import { groupMembers } from '../domain/groups';
@@ -136,7 +137,7 @@
           </div>
         </article>
       {:else}
-        <div class="empty" style="grid-column:1/-1">Aún no has añadido amigos.</div>
+        <EmptyState>Aún no has añadido amigos.</EmptyState>
       {/each}
     </div>
   </section>
@@ -175,7 +176,7 @@
           </div>
         </article>
       {:else}
-        <div class="empty" style="grid-column:1/-1">Aún no has añadido grupos. Crea un grupo y añade amigos guardados para reutilizarlos en otras listas.</div>
+        <EmptyState>Aún no has añadido grupos. Crea un grupo y añade amigos guardados para reutilizarlos en otras listas.</EmptyState>
       {/each}
     </div>
   </section>

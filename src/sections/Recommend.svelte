@@ -1,16 +1,23 @@
 <script lang="ts">
   import { coverUrl, findInLibrary } from '../content/library';
+  import EmptyState from '../components/EmptyState.svelte';
+  import GameCover from '../components/GameCover.svelte';
   import { loadSimilarTaste } from '../data/crowd';
   import { groupMembers, playGroupKey } from '../domain/groups';
   import { CROWD_LOVES, recommend, type CrowdPick, type Recommendation } from '../domain/recommend';
   import { playStats } from '../domain/stats';
   import { learnTaste } from '../domain/taste';
   import { formatDecimal, localToday, nameKey } from '../domain/text';
-  import type { Group } from '../domain/types';
+  import type { Game, Group } from '../domain/types';
+  import { deal } from '../motion';
   import { app } from '../stores/app.svelte';
+  import GameDetail from './GameDetail.svelte';
   import RandomGame from './RandomGame.svelte';
 
-  let { onedit }: { onedit: (gameId: string) => void } = $props();
+  let { onedit, onplay }: { onedit: (gameId: string) => void; onplay: (game: string) => void } = $props();
+
+  /** The suggestion whose card is open (the same sheet as in the catalog). */
+  let detail = $state<Game | null>(null);
 
   const moods = ['Fiesta', 'Cooperativo', 'Estrategia', 'Dos jugadores', 'Roles ocultos', 'Familiar', 'Humor', 'Aventura', 'Cartas'];
   let players = $state(4);
@@ -97,24 +104,23 @@
       <div class="reco">
         <h3>Mis sugerencias para {results.players} {results.players === 1 ? 'persona' : 'personas'}{results.group ? ' · ' + results.group.name : ''}</h3>
         <p class="details">Son sugerencias orientativas: revisa los jugadores máximos si aparece un dato pendiente de confirmar.</p>
-        <div class="grid">
-          {#each results.list as { game, groupNote, reasons } (game.id)}
-            <article class="card">
-              <div class="cardtop">
-                <div class="emoji">{game.types.includes('Cooperativo') ? '🤝' : game.types.includes('Fiesta') ? '🎉' : '🎲'}</div>
-                <div><h3>{game.name}</h3><div class="sub">{game.players} jugadores · {game.duration ?? '?'} min</div></div>
-              </div>
-              <div class="tags">{#each game.types as type (type)}<span class="tag">{type}</span>{/each}</div>
-              {#if groupNote}<span class="reco-note">{groupNote}</span>{/if}
-              {#each reasons as reason (reason)}<span class="reco-reason">✦ {reason}</span>{/each}
-              <p class="details">📍 {game.locations.join(' · ') || 'Lugar por asignar'}</p>
-              <button class="btn secondary" onclick={() => onedit(game.id)}>Ver / editar ficha</button>
-            </article>
-          {/each}
-        </div>
+        <!-- Dealt again on every search, like the catalog's covers. -->
+        {#key results}
+          <ol class="reco-picks" use:deal>
+            {#each results.list as { game, groupNote, reasons }, rank (game.id)}
+              <li class="reco-pick">
+                <span class="reco-rank" aria-label="Sugerencia {rank + 1}">{rank + 1}</span>
+                <GameCover {game} onopen={g => (detail = g)} />
+                {#if groupNote}<span class="reco-note">{groupNote}</span>{/if}
+                {#each reasons as reason (reason)}<span class="reco-reason">✦ {reason}</span>{/each}
+                <span class="reco-place">📍 {game.locations.join(' · ') || 'Lugar por asignar'}</span>
+              </li>
+            {/each}
+          </ol>
+        {/key}
       </div>
     {:else}
-      <div class="empty">No he encontrado una combinación clara. Prueba con otro número o plan.</div>
+      <EmptyState>No he encontrado una combinación clara. Prueba con otro número o plan.</EmptyState>
     {/if}
     {#if outside.length}
       <div class="reco outside">
@@ -134,3 +140,10 @@
     {/if}
   {/if}
 </section>
+
+<GameDetail
+  game={detail}
+  onclose={() => (detail = null)}
+  onedit={game => { detail = null; onedit(game.id); }}
+  onplay={game => { detail = null; onplay(game.name); }}
+/>

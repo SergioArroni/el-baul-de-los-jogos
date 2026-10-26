@@ -1,5 +1,6 @@
 <script lang="ts">
   import { untrack } from 'svelte';
+  import EmptyState from '../components/EmptyState.svelte';
   import GameCover from '../components/GameCover.svelte';
   import { typeEmoji } from '../domain/art';
   import { buildShelves, byName, filterGames, noFilters, topTypes, type CatalogFilters } from '../domain/catalog';
@@ -85,7 +86,7 @@
   </div>
 
   {#if !app.games.length}
-    <div class="empty">Tu baúl está vacío. Pulsa «Añadir juego» para guardar el primero.</div>
+    <EmptyState>Tu baúl está vacío. Pulsa «Añadir juego» para guardar el primero.</EmptyState>
   {:else if filtering}
     <section class="shelf">
       <div class="shelf-head">
@@ -95,7 +96,7 @@
       {#if results.length}
         <div class="cover-grid" bind:this={resultsGrid}>{#each results as game (game.id)}<GameCover {game} onopen={g => (detail = g)} />{/each}</div>
       {:else}
-        <div class="empty">No hay juegos con esos filtros. Prueba a cambiar la búsqueda.</div>
+        <EmptyState>No hay juegos con esos filtros. Prueba a cambiar la búsqueda.</EmptyState>
       {/if}
     </section>
   {:else}

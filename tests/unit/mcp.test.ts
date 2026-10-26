@@ -50,6 +50,7 @@ describe('MCP endpoint', () => {
   it('introduces itself and lists read-only tools', async () => {
     const init = await rpc('initialize', { protocolVersion: '2025-06-18', capabilities: {}, clientInfo: { name: 't', version: '1' } });
     expect(init.body.result.serverInfo.name).toBe('el-baul-de-los-jogos');
+    expect(init.body.result.serverInfo.icons[0].src).toMatch(/jogino-icon/);
     const { body } = await rpc('tools/list', {});
     const tools = body.result.tools as { name: string; annotations?: { readOnlyHint?: boolean } }[];
     expect(tools.map(t => t.name).sort()).toEqual(['list_games', 'list_groups', 'play_stats', 'recommend_games', 'who_am_i']);

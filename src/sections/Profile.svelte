@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
   import Avatar from '../components/Avatar.svelte';
+  import ConnectAI from './ConnectAI.svelte';
   import Modal from '../components/Modal.svelte';
   import { deleteMyAccount } from '../data/account';
   import { supabase } from '../data/client';
@@ -187,6 +188,8 @@
       <p class="notice">Para elegir la privacidad, primero hay que activar los perfiles en Supabase (sql/profiles-privacy.sql).</p>
     {/if}
   {/if}
+  <ConnectAI />
+
   {#if app.user}
     <div class="sectionhead" style="margin-top:34px"><div><h2 style="font-size:1.35rem">Borrar mi cuenta</h2><p>Elimina tu cuenta y tus datos para siempre.</p></div></div>
     <div class="card profile-card">

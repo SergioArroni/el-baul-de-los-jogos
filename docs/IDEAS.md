@@ -22,3 +22,5 @@ Al terminarla, se borra de aquí.
    obliga a pasar Vercel a Pro, a pedir licencia comercial a BGG y a revisar lo fiscal.
 
 ## Ideas nuevas
+- **Tarjetas dentro del chat (MCP Apps):** que Claude y ChatGPT enseñen las recomendaciones con portadas y Jogiño en la propia conversación, no solo texto.
+- **Color de Jogiño en la cuenta:** hoy se guarda por dispositivo; guardarlo en el perfil (columna nueva) para que salga igual en el móvil y en el ordenador.

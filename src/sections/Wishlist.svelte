@@ -1,5 +1,6 @@
 <script lang="ts">
   import MeepleToken from '../components/MeepleToken.svelte';
+  import EmptyState from '../components/EmptyState.svelte';
   import CatalogSuggest from '../components/CatalogSuggest.svelte';
   import Modal from '../components/Modal.svelte';
   import { deleteProposal, proposeGame, setMeeple } from '../data/wishlist';
@@ -111,7 +112,7 @@
           </div>
         </article>
       {:else}
-        <div class="empty" style="grid-column:1/-1">Todavía no hay propuestas. Añade la primera compra candidata.</div>
+        <EmptyState>Todavía no hay propuestas. Añade la primera compra candidata.</EmptyState>
       {/each}
     {/if}
   </div>

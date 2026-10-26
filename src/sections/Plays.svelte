@@ -1,5 +1,6 @@
 <script lang="ts">
   import { countUp } from '../motion';
+  import EmptyState from '../components/EmptyState.svelte';
   import Avatar from '../components/Avatar.svelte';
   import { ratePlay } from '../data/plays';
   import { tap } from '../platform/native';
@@ -76,7 +77,7 @@
         {/each}
       </div>
     {:else}
-      <div class="empty">Crea un grupo en Comunidad o registra tu primera partida.</div>
+      <EmptyState>Crea un grupo en Comunidad o registra tu primera partida.</EmptyState>
     {/if}
   {:else}
     <div class="play-view-head"><button class="btn ghost small" onclick={() => (app.playView = null)}>← Grupos</button><h3>{view.name}</h3></div>
@@ -141,7 +142,7 @@
         {/each}
       </div>
     {:else}
-      <div class="empty">Todavía no hay partidas en este grupo. Pulsa «Registrar partida» para apuntar la primera.</div>
+      <EmptyState>Todavía no hay partidas en este grupo. Pulsa «Registrar partida» para apuntar la primera.</EmptyState>
     {/if}
   {/if}
 </section>

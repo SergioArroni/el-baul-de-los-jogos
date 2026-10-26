@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { tick } from 'svelte';
   import ConfirmDialog from './components/ConfirmDialog.svelte';
   import Header from './components/Header.svelte';
   import Nav from './components/Nav.svelte';
@@ -15,6 +16,8 @@
   import Ranking from './sections/Ranking.svelte';
   import Recommend from './sections/Recommend.svelte';
   import Wishlist from './sections/Wishlist.svelte';
+  import JoginoBuddy from './mascot/JoginoBuddy.svelte';
+  import { jogino } from './mascot/prefs.svelte';
   import { handleBackButton, hideSplash } from './platform/native';
   import { enter } from './motion';
   import { app, type Tab } from './stores/app.svelte';
@@ -40,6 +43,18 @@
     return true;
   });
 
+  // On phones the tab bar sits at the bottom: Jogiño's floor is on top of it.
+  function tabBarHeight(): number {
+    const bar = document.querySelector('.nav');
+    return bar && getComputedStyle(bar).position === 'fixed' ? bar.getBoundingClientRect().height : 0;
+  }
+
+  async function openConnect() {
+    navigate('profile');
+    await tick();
+    document.getElementById('conectar-ia')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
   function navigate(tab: Tab) {
     if (tab === 'backup' && !app.isAdmin) return;
     app.tab = tab;
@@ -60,7 +75,7 @@
     {:else if app.tab === 'places'}
       <Places />
     {:else if app.tab === 'recommend'}
-      <Recommend onedit={id => (editGameId = id)} />
+      <Recommend onedit={id => (editGameId = id)} onplay={game => (playDialog = { open: true, game })} />
     {:else if app.tab === 'plays'}
       <Plays onplay={({ play, group }) => (playDialog = { open: true, play, group })} />
     {:else if app.tab === 'ranking'}
@@ -83,3 +98,12 @@
 <PlayForm open={playDialog.open} play={playDialog.play} presetGroup={playDialog.group} presetGame={playDialog.game} onclose={() => (playDialog = { open: false })} />
 <GameForm open={!!editGame} game={editGame} onclose={() => (editGameId = null)} />
 <ConfirmDialog />
+{#if !jogino.hidden}
+  <JoginoBuddy
+    text="Conecta tu Claude o ChatGPT y pregúntame por tu baúl: «¿qué cooperativo para 5 tenemos en casa de Enzo?»."
+    action={{ label: 'Cómo conectarlo', onclick: openConnect }}
+    canHide
+    floorGap={tabBarHeight}
+    shelf={40}
+  />
+{/if}

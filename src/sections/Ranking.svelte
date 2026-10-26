@@ -1,5 +1,6 @@
 <script lang="ts">
   import { untrack } from 'svelte';
+  import EmptyState from '../components/EmptyState.svelte';
   import { coverUrl, findInLibrary } from '../content/library';
   import { loadGlobalRanking } from '../data/ranking';
   import { playGroupKey } from '../domain/groups';
@@ -92,7 +93,7 @@
         </ol>
       {/key}
     {:else}
-      <div class="empty">{empty}</div>
+      <EmptyState>{empty}</EmptyState>
     {/if}
   {/if}
 </section>

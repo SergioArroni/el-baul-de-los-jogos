@@ -88,9 +88,11 @@ test('recommendations fit the number of players and the plan', async ({ page }) 
   await page.getByLabel('Tipo de plan').selectOption('Fiesta');
   await page.getByRole('button', { name: 'Encontrar juegos' }).click();
   await expect(page.getByRole('heading', { name: 'Mis sugerencias para 8 personas' })).toBeVisible();
-  const cards = page.locator('.reco .card');
-  expect(await cards.count()).toBeGreaterThan(0);
-  await expect(cards.first()).toContainText('Fiesta');
+  const picks = page.locator('.reco-pick');
+  expect(await picks.count()).toBeGreaterThan(0);
+  // Same covers as the catalog: tapping one opens its sheet, which shows the plan's style.
+  await picks.first().locator('.cover').click();
+  await expect(page.getByRole('dialog')).toContainText('Fiesta');
 });
 
 test('friends and groups work together', async ({ page }) => {
@@ -152,4 +154,37 @@ test('the dice picks a random game that fits, without repeating', async ({ page 
   const first = await page.locator('.random-pick .cover-title').innerText();
   await page.getByRole('button', { name: '🎲 Otro' }).click();
   await expect(page.locator('.random-pick .cover-title')).not.toHaveText(first);
+});
+
+test('Jogiño sits on his shelf, explains how to connect an assistant and can be repainted or hidden', async ({ page }) => {
+  const jogino = page.getByRole('button', { name: 'Jogiño: conectar Claude o ChatGPT' });
+  await jogino.click();
+  await expect(page.getByRole('dialog', { name: 'Jogiño' })).toContainText('Claude o ChatGPT');
+  await page.getByRole('button', { name: 'Cómo conectarlo' }).click();
+  await expect(page.getByRole('heading', { name: 'Conectar con Claude o ChatGPT' })).toBeVisible();
+  await expect(page.getByLabel('Dirección del conector')).toHaveValue('https://el-baul-de-los-jogos.vercel.app/api/mcp');
+
+  await page.getByRole('button', { name: 'Negro' }).click();
+  await expect(page.getByRole('button', { name: 'Negro' })).toHaveAttribute('aria-pressed', 'true');
+  await page.getByLabel(/Mostrar a Jogiño/).uncheck();
+  await expect(jogino).toHaveCount(0);
+  // The choice is kept on this device.
+  await page.reload();
+  await expect(page.getByRole('heading', { name: 'Tu colección' })).toBeVisible();
+  await expect(jogino).toHaveCount(0);
+});
+
+test('Jogiño can be thrown and walks back to his shelf', async ({ page }) => {
+  const jogino = page.locator('.jogino-buddy');
+  await expect(jogino).toHaveAttribute('data-mode', 'home', { timeout: 5000 });
+  const home = (await jogino.boundingBox())!;
+  await page.mouse.move(home.x + 34, home.y + 30);
+  await page.mouse.down();
+  for (let i = 1; i <= 6; i++) await page.mouse.move(home.x + 34 - i * 40, home.y + 30 - i * 30);
+  await page.mouse.up();
+  await expect(jogino).not.toHaveAttribute('data-mode', 'home');
+  await expect(jogino).toHaveAttribute('data-mode', 'home', { timeout: 15000 });
+  const back = (await jogino.boundingBox())!;
+  expect(Math.abs(back.x - home.x)).toBeLessThan(2);
+  expect(Math.abs(back.y - home.y)).toBeLessThan(2);
 });
