@@ -16,5 +16,6 @@ test('typing a name suggests catalog games and picking one fills the form', asyn
   await expect(page.getByLabel('Duración en minutos')).toHaveValue('120');
   await expect(page.getByLabel('Dureza (1–5)')).toHaveValue('2');
   await expect(page.getByLabel('Estilos (separados por comas)')).toHaveValue('Estrategia, Negociación');
-  await expect(page.getByRole('option')).toHaveCount(0);
+  // The suggestions close once one is picked (the form's own dropdowns have options too).
+  await expect(page.getByRole('listbox', { name: 'Juegos del catálogo' })).toHaveCount(0);
 });
