@@ -9,6 +9,7 @@ casa de Enzo?» o «¿quién gana más al Carcassonne?». Solo puede **leer** tu
 - **En la app:** «Mi perfil» → «Conectar con Claude o ChatGPT» tiene la dirección para copiar y estos pasos (o toca a Jogiño, el meeple de la esquina).
 
 ## Claude (claude.ai o la app de escritorio)
+Funciona también con el plan gratuito, que permite un conector personalizado.
 1. Abre **Ajustes → Conectores** y pulsa **Añadir conector personalizado**.
 2. Nombre: `El Baúl de los Jogos`. URL: la de arriba. Guarda.
 3. Pulsa **Conectar**. Se abre una ventana: entra con tu correo o apodo del Baúl.
@@ -17,8 +18,9 @@ casa de Enzo?» o «¿quién gana más al Carcassonne?». Solo puede **leer** tu
 
 ## ChatGPT
 Revisado en octubre de 2026: desde julio de 2026 los conectores están dentro de **Plugins** (antes
-«Aplicaciones y conectores»). Hace falta un plan de pago (Plus o superior) y la web, chatgpt.com: la
-app del móvil aún no deja añadirlos.
+«Aplicaciones y conectores»). Hace falta un plan Plus o superior (el gratuito y el **Go** no permiten
+conectores propios; ninguna fuente de OpenAI incluye el Go) y la web, chatgpt.com: la app del móvil
+aún no deja añadirlos.
 1. Si te lo pide, activa el **modo desarrollador** en **Ajustes → Seguridad e inicio de sesión** (en
    las cuentas más nuevas ya no hace falta).
 2. Abre **Plugins** (chatgpt.com/plugins) y pulsa **+** para crear uno.

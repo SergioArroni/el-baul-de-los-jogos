@@ -46,6 +46,7 @@
   <details>
     <summary>En Claude</summary>
     <ol>
+      <li>Vale también el plan gratuito de Claude (permite un conector propio).</li>
       <li>Abre <strong>Ajustes → Conectores</strong> y pulsa <strong>Añadir conector personalizado</strong>.</li>
       <li>Nombre: «El Baúl de los Jogos». URL: la de arriba.</li>
       <li>Pulsa <strong>Conectar</strong> y entra con tu cuenta del Baúl.</li>
@@ -56,7 +57,7 @@
   <details>
     <summary>En ChatGPT</summary>
     <ol>
-      <li>Desde <strong>chatgpt.com</strong> en el navegador (la app del móvil aún no deja añadirlos) y con un plan de pago (Plus o superior).</li>
+      <li>Desde <strong>chatgpt.com</strong> en el navegador (la app del móvil aún no deja añadirlos). Hace falta un plan Plus o superior: el gratuito y el Go no permiten conectores propios.</li>
       <li>Si te lo pide, activa el <strong>modo desarrollador</strong>: <strong>Ajustes → Seguridad e inicio de sesión</strong>.</li>
       <li>Abre <strong>Plugins</strong> (<strong>chatgpt.com/plugins</strong>) y pulsa <strong>+</strong> para crear uno.</li>
       <li>Nombre: «El Baúl de los Jogos». URL: la de arriba. Autenticación: <strong>OAuth</strong>.</li>
