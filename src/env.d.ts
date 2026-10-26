@@ -6,4 +6,9 @@ interface ImportMetaEnv {
 interface Window {
   /** Same as WEB_ORIGIN, for the plain-HTML login page (set by src/static-pages.ts). */
   BAUL_WEB_ORIGIN?: string;
+  /** Google sign-in through the phone's browser, only inside the APK (set by src/login-native.ts). */
+  BAUL_GOOGLE?: {
+    open(url: string, key: string): Promise<string | null>;
+    onReturn(url: string, key: string, done: (error: string | null) => void): void;
+  };
 }

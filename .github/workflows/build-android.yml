@@ -38,6 +38,9 @@ jobs:
         run: npm run android:icons
       - name: Sync Capacitor
         run: npm run android:sync
+      # The way back from "Entrar con Google" into the app (src/platform/google.ts).
+      - name: Add the login link to the Android manifest
+        run: node scripts/android-deep-link.mjs
       # Android only installs an update when its versionCode is higher, so use the run number.
       - name: Set version number
         run: |
@@ -128,6 +131,11 @@ jobs:
             adb shell am start -W -n es.sergioarroni.miludoteca/.MainActivity
             sleep 15
             adb exec-out screencap -p > launch-offline.png
+            adb shell am start -W -a android.intent.action.VIEW -d "es.sergioarroni.miludoteca://login-callback?error_description=Prueba%20del%20enlace" > deep-link.txt 2>&1 || true
+            cat deep-link.txt
+            grep -q "es.sergioarroni.miludoteca/.MainActivity" deep-link.txt || { echo "::error::The login link does not open the app"; exit 1; }
+            sleep 5
+            adb exec-out screencap -p > deep-link.png
             adb logcat -d -s Capacitor:* chromium:* > logcat.txt || true
       - name: Upload screenshots
         if: always()
@@ -137,5 +145,6 @@ jobs:
           path: |
             launch-online.png
             launch-offline.png
+            deep-link.png
             logcat.txt
           retention-days: 14
