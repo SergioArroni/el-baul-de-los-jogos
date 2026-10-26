@@ -56,10 +56,14 @@
   <details>
     <summary>En ChatGPT</summary>
     <ol>
-      <li>Abre <strong>Ajustes → Aplicaciones y conectores</strong> y crea uno nuevo (en algunos planes hay que activar el «modo desarrollador»).</li>
-      <li>Pon la URL de arriba y elige autenticación <strong>OAuth</strong>.</li>
+      <li>Desde <strong>chatgpt.com</strong> en el navegador (la app del móvil aún no deja añadirlos) y con un plan de pago (Plus o superior).</li>
+      <li>Si te lo pide, activa el <strong>modo desarrollador</strong>: <strong>Ajustes → Seguridad e inicio de sesión</strong>.</li>
+      <li>Abre <strong>Plugins</strong> (<strong>chatgpt.com/plugins</strong>) y pulsa <strong>+</strong> para crear uno.</li>
+      <li>Nombre: «El Baúl de los Jogos». URL: la de arriba. Autenticación: <strong>OAuth</strong>.</li>
       <li>Entra con tu cuenta del Baúl y pulsa <strong>Permitir</strong>.</li>
+      <li>En una conversación, pulsa <strong>+</strong> junto a la caja de texto y elige El Baúl de los Jogos.</li>
     </ol>
+    <p class="connect-note">ChatGPT cambia sus menús a menudo: si no encuentras algo, busca «plugins», «MCP» o «desarrollador» en sus ajustes.</p>
   </details>
   <p class="connect-note">Para quitar el acceso, borra el conector en Claude o ChatGPT.</p>
 

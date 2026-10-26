@@ -16,13 +16,18 @@ casa de Enzo?» o «¿quién gana más al Carcassonne?». Solo puede **leer** tu
 5. En una conversación, activa el conector y pregunta lo que quieras.
 
 ## ChatGPT
-Los conectores propios dependen del plan (algunos planes de pago) y a veces del «modo desarrollador».
-1. Abre **Ajustes → Aplicaciones y conectores** (o **Conectores**) y crea uno nuevo.
-2. Pon la URL de arriba y elige autenticación **OAuth**.
-3. Al conectar, entra con tu cuenta del Baúl y pulsa **Permitir**.
+Revisado en octubre de 2026: desde julio de 2026 los conectores están dentro de **Plugins** (antes
+«Aplicaciones y conectores»). Hace falta un plan de pago (Plus o superior) y la web, chatgpt.com: la
+app del móvil aún no deja añadirlos.
+1. Si te lo pide, activa el **modo desarrollador** en **Ajustes → Seguridad e inicio de sesión** (en
+   las cuentas más nuevas ya no hace falta).
+2. Abre **Plugins** (chatgpt.com/plugins) y pulsa **+** para crear uno.
+3. Nombre: `El Baúl de los Jogos`. URL: la de arriba. Autenticación: **OAuth**.
+4. Entra con tu cuenta del Baúl y pulsa **Permitir**.
+5. En una conversación, pulsa **+** junto a la caja de texto y elige El Baúl de los Jogos.
 
-Los menús de ambas apps cambian a menudo: si algún nombre no coincide, busca «conector» o «MCP» en
-sus ajustes.
+Los menús de ambas apps cambian a menudo: si algún nombre no coincide, busca «plugins», «conector»,
+«MCP» o «desarrollador» en sus ajustes.
 
 ## Qué puede hacer
 - `who_am_i`: con qué cuenta está conectado.
