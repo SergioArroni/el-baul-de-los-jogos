@@ -4,23 +4,28 @@
 
 <script lang="ts">
   import { PAINT, type JoginoColor } from './colors';
+  import JoginoCostume from './JoginoCostume.svelte';
   import { jogino } from './prefs.svelte';
+  import { wornCostume, type Costume } from './seasons';
 
   /** Jogiño, the Baúl's wooden meeple with googly eyes. Drawn in a 100×100 box. */
   interface Props {
     pose?: JoginoPose;
     /** Defaults to the colour the person chose. */
     color?: JoginoColor;
+    /** Defaults to what he's wearing today (the calendar's costume or the one chosen); null = none. */
+    costume?: Costume | null;
     /** Where the pupils look, each axis from -1 to 1 (the thrown Jogiño moves them every frame). */
     look?: { x: number; y: number };
     /** Accessible name; without it the drawing is decorative. */
     label?: string;
   }
 
-  let { pose = 'idle', color, look = { x: 0.2, y: 0.25 }, label }: Props = $props();
+  let { pose = 'idle', color, costume, look = { x: 0.2, y: 0.25 }, label }: Props = $props();
 
   const uid = $props.id();
   const paint = $derived(PAINT[color ?? jogino.color]);
+  const worn = $derived(costume === undefined ? wornCostume(jogino.costume, new Date()) : costume);
   const SHAPE = 'M50 6C59 6 66 13 66 22C66 27 63.5 31 60 33.5C70 35.5 84 38 90 42.5C95.5 46.5 93.5 55.5 86.5 57C79 58.6 71 59.5 66 61.5C68 70 74.5 79 80.5 87C84 91.5 81 95.5 75.5 95.5L60 95.5C56.5 95.5 54.5 93 53.5 89.5L50 79L46.5 89.5C45.5 93 43.5 95.5 40 95.5L24.5 95.5C19 95.5 16 91.5 19.5 87C25.5 79 32 70 34 61.5C29 59.5 21 58.6 13.5 57C6.5 55.5 4.5 46.5 10 42.5C16 38 30 35.5 40 33.5C36.5 31 34 27 34 22C34 13 41 6 50 6Z';
 
   // Wood grain in the paint's grain colour (the filter wants it as 0–1 channels).
@@ -40,7 +45,7 @@
   };
 </script>
 
-<svg class="jogino" viewBox="-8 -6 118 108" role={label ? 'img' : undefined} aria-label={label} aria-hidden={label ? undefined : 'true'}>
+<svg class="jogino" data-costume={worn ?? undefined} viewBox="-8 -6 118 108" role={label ? 'img' : undefined} aria-label={label} aria-hidden={label ? undefined : 'true'}>
   <defs>
     <linearGradient id="{uid}-paint" x1="0" y1="0" x2="0.3" y2="1">
       <stop offset="0" stop-color={paint.light} /><stop offset="1" stop-color={paint.dark} />
@@ -57,9 +62,11 @@
 
   <ellipse cx="50" cy="97" rx="34" ry="3.6" fill="#10201833" />
   <g transform={pose === 'vacio' ? 'translate(-6 0)' : undefined}>
+    {#if worn}<JoginoCostume costume={worn} layer="back" />{/if}
     <path d={SHAPE} fill="url(#{uid}-paint)" />
     <path d={SHAPE} fill="url(#{uid}-shine)" />
     <path d={SHAPE} fill="#000" filter="url(#{uid}-grain)" opacity={paint.grainOpacity} />
+    {#if worn}<JoginoCostume costume={worn} layer="face" />{/if}
 
     <circle cx="43" cy="19" r="7.2" fill="#fff" stroke="#1d2923" stroke-width="1.1" />
     <circle cx="58" cy="18" r="8.4" fill="#fff" stroke="#1d2923" stroke-width="1.1" />
@@ -69,6 +76,7 @@
     {#if pose === 'hola'}
       <circle cx="38.5" cy="27" r="2.6" fill="#f07a62" opacity=".55" /><circle cx="62.5" cy="27" r="2.6" fill="#f07a62" opacity=".55" />
     {/if}
+    {#if worn}<JoginoCostume costume={worn} layer="front" />{/if}
   </g>
 
   {#if pose === 'permiso'}

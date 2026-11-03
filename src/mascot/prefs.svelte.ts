@@ -1,4 +1,4 @@
-// Jogiño's colour and whether he's hidden: a per-device choice, so it lives in the browser.
+// Jogiño's colour, costume and whether he's hidden: a per-device choice, so it lives in the browser.
 // Storage can be missing (private mode, blocked site data): then he's simply wooden and visible.
 import { readPrefs, type JoginoPrefs } from './prefs';
 

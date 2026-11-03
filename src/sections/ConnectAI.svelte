@@ -2,6 +2,7 @@
   import Jogino from '../mascot/Jogino.svelte';
   import { JOGINO_COLORS, PAINT } from '../mascot/colors';
   import { jogino, saveJogino } from '../mascot/prefs.svelte';
+  import { COSTUME_INFO, COSTUMES, seasonFor, type CostumeChoice } from '../mascot/seasons';
 
   /**
    * «Mi perfil» → how to connect your own Claude or ChatGPT (the MCP connector), told by
@@ -10,6 +11,12 @@
   // Always production: the permission page only works on the main site (docs/CONECTAR-IA.md).
   const MCP_URL = 'https://el-baul-de-los-jogos.vercel.app/api/mcp';
   let copied = $state('');
+  const season = seasonFor(new Date());
+  const costumeChoices: { value: CostumeChoice; label: string }[] = [
+    { value: 'auto', label: `Según la fecha (${season ? COSTUME_INFO[season].label.toLowerCase() : 'ahora sin disfraz'})` },
+    { value: 'ninguno', label: 'Sin disfraz' },
+    ...COSTUMES.map(costume => ({ value: costume, label: COSTUME_INFO[costume].label })),
+  ];
 
   async function copy() {
     try {
@@ -82,6 +89,18 @@
         </button>
       {/each}
     </div>
+    <div class="paint-row costume-row" role="group" aria-label="Disfraz de Jogiño">
+      {#each costumeChoices as choice (choice.value)}
+        <button
+          type="button"
+          class="paint-choice"
+          aria-pressed={jogino.costume === choice.value}
+          onclick={() => saveJogino({ costume: choice.value })}
+        >
+          <span class="paint-figure"><Jogino costume={choice.value === 'auto' ? season : choice.value === 'ninguno' ? null : choice.value} /></span>{choice.label}
+        </button>
+      {/each}
+    </div>
     <label class="check">
       <input type="checkbox" checked={!jogino.hidden} onchange={event => saveJogino({ hidden: !event.currentTarget.checked })} />
       Mostrar a Jogiño en su esquina (puedes cogerlo y lanzarlo)
@@ -106,10 +125,13 @@
   .paint-choice { display: grid; justify-items: center; gap: 4px; padding: 8px 4px; border: 1px solid var(--line); border-radius: 12px; background: var(--paper); color: var(--ink); font-size: .75rem; cursor: pointer; }
   .paint-choice[aria-pressed='true'] { border-color: var(--green); box-shadow: 0 0 0 2px color-mix(in srgb, var(--green) 30%, transparent); }
   .paint-figure { width: 44px; height: 40px; }
+  .costume-row { margin-top: 12px; grid-template-columns: repeat(auto-fill, minmax(86px, 1fr)); }
+  .costume-row .paint-figure { margin-top: 10px; }
+  .paint-choice { text-align: center; }
   .check { display: flex; gap: 8px; align-items: center; margin-top: 12px; font-size: .88rem; }
   @media (max-width: 640px) {
     .connect-intro { align-items: flex-start; }
     .connect-jogino { width: 64px; height: 60px; }
-    .paint-row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .paint-row:not(.costume-row) { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   }
 </style>

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { nearestUpright, releaseVelocity, step, type Body } from '../../src/mascot/physics';
 import { readPrefs } from '../../src/mascot/prefs';
+import { easter, greetingFor, seasonFor, wornCostume } from '../../src/mascot/seasons';
 
 const bounds = { right: 1000, floor: 700 };
 const at = (body: Partial<Body>): Body => ({ x: 500, y: 300, vx: 0, vy: 0, angle: 0, spin: 0, ...body });
@@ -54,9 +55,49 @@ describe('Jogiño thrown across the screen', () => {
 
 describe('Jogiño preferences', () => {
   it('are wooden and visible unless the person chose otherwise', () => {
-    expect(readPrefs(null)).toEqual({ color: 'madera', hidden: false });
-    expect(readPrefs('{"color":"negro","hidden":true}')).toEqual({ color: 'negro', hidden: true });
-    expect(readPrefs('{"color":"dorado"}')).toEqual({ color: 'madera', hidden: false });
-    expect(readPrefs('not json')).toEqual({ color: 'madera', hidden: false });
+    expect(readPrefs(null)).toEqual({ color: 'madera', hidden: false, costume: 'auto' });
+    expect(readPrefs('{"color":"negro","hidden":true,"costume":"navidad"}')).toEqual({ color: 'negro', hidden: true, costume: 'navidad' });
+    expect(readPrefs('{"color":"dorado","costume":"pirata"}')).toEqual({ color: 'madera', hidden: false, costume: 'auto' });
+    expect(readPrefs('not json')).toEqual({ color: 'madera', hidden: false, costume: 'auto' });
+  });
+});
+
+describe('Jogiño dresses up for the time of year', () => {
+  const on = (iso: string) => seasonFor(new Date(iso + 'T12:00:00'));
+
+  it('knows when Easter falls, so Carnaval can move with it', () => {
+    expect(easter(2026)).toEqual({ month: 4, day: 5 });
+    expect(easter(2027)).toEqual({ month: 3, day: 28 });
+    expect(easter(2038)).toEqual({ month: 4, day: 25 });
+  });
+
+  it('wears the costume of the special days, and of the season the rest of the year', () => {
+    expect(on('2026-10-31')).toBe('halloween');
+    expect(on('2026-11-03')).toBe('otono');
+    expect(on('2026-12-24')).toBe('navidad');
+    expect(on('2026-12-31')).toBe('finDeAno');
+    expect(on('2027-01-01')).toBe('finDeAno');
+    expect(on('2027-01-04')).toBe('navidad');
+    expect(on('2027-01-06')).toBe('reyes');
+    expect(on('2027-01-20')).toBeNull();
+    expect(on('2026-02-14')).toBe('sanValentin');
+    expect(on('2026-04-10')).toBe('primavera');
+    expect(on('2026-08-01')).toBe('verano');
+    expect(on('2026-09-20')).toBe('otono');
+  });
+
+  it('Carnaval goes from jueves lardero to the burial of the sardine, a different week each year', () => {
+    // 2026: Carnival Tuesday is 17 February; 2027: 9 February.
+    expect([on('2026-02-11'), on('2026-02-12'), on('2026-02-14'), on('2026-02-18'), on('2026-02-19')]).toEqual(['sanValentin', 'carnaval', 'sanValentin', 'carnaval', null]);
+    expect([on('2027-02-03'), on('2027-02-04'), on('2027-02-10'), on('2027-02-11')]).toEqual([null, 'carnaval', 'carnaval', 'sanValentin']);
+  });
+
+  it('follows the calendar unless the person picked a costume or none', () => {
+    const halloween = new Date('2026-10-31T12:00:00');
+    expect(wornCostume('auto', halloween)).toBe('halloween');
+    expect(wornCostume('verano', halloween)).toBe('verano');
+    expect(wornCostume('ninguno', halloween)).toBeNull();
+    expect(greetingFor(halloween)).toBe('¡Truco o trato! Soy Jogiño.');
+    expect(greetingFor(new Date('2027-01-20T12:00:00'))).toBe('¡Hola, soy Jogiño!');
   });
 });

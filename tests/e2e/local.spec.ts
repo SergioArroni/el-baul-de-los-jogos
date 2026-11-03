@@ -166,6 +166,10 @@ test('Jogiño sits on his shelf, explains how to connect an assistant and can be
 
   await page.getByRole('button', { name: 'Negro' }).click();
   await expect(page.getByRole('button', { name: 'Negro' })).toHaveAttribute('aria-pressed', 'true');
+  // His costume follows the calendar unless you pick one.
+  await expect(page.getByRole('button', { name: /^Según la fecha/ })).toHaveAttribute('aria-pressed', 'true');
+  await page.getByRole('button', { name: 'Navidad' }).click();
+  await expect(jogino.locator('svg')).toHaveAttribute('data-costume', 'navidad');
   await page.getByLabel(/Mostrar a Jogiño/).uncheck();
   await expect(jogino).toHaveCount(0);
   // The choice is kept on this device.
@@ -175,6 +179,9 @@ test('Jogiño sits on his shelf, explains how to connect an assistant and can be
 });
 
 test('Jogiño can be thrown and walks back to his shelf', async ({ page }) => {
+  // In costume he scatters the season (confetti at Carnaval) when thrown.
+  await page.evaluate(() => localStorage.setItem('el-baul-jogino', JSON.stringify({ costume: 'carnaval' })));
+  await page.reload();
   const jogino = page.locator('.jogino-buddy');
   await expect(jogino).toHaveAttribute('data-mode', 'home', { timeout: 5000 });
   const home = (await jogino.boundingBox())!;
@@ -183,6 +190,7 @@ test('Jogiño can be thrown and walks back to his shelf', async ({ page }) => {
   for (let i = 1; i <= 6; i++) await page.mouse.move(home.x + 34 - i * 40, home.y + 30 - i * 30);
   await page.mouse.up();
   await expect(jogino).not.toHaveAttribute('data-mode', 'home');
+  expect(await page.locator('.jogino-spark').count()).toBeGreaterThan(0);
   await expect(jogino).toHaveAttribute('data-mode', 'home', { timeout: 15000 });
   const back = (await jogino.boundingBox())!;
   expect(Math.abs(back.x - home.x)).toBeLessThan(2);

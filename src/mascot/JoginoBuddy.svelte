@@ -5,6 +5,8 @@
   import Jogino, { type JoginoPose } from './Jogino.svelte';
   import { nearestUpright, releaseVelocity, step, type Body } from './physics';
   import { jogino, saveJogino } from './prefs.svelte';
+  import { greetingFor, wornCostume } from './seasons';
+  import { scatter } from './sparks';
 
   /**
    * Jogiño lives in a corner of the screen. Tap him and he offers to connect your Claude or
@@ -53,6 +55,9 @@
   let standUp: gsap.core.Tween | undefined;
   let ladderTween: gsap.core.Tween | undefined;
   let bubbleAt = $state({ right: 0, bottom: 0 });
+  // In costume he leaves a trail of the season behind him when thrown.
+  const worn = $derived(wornCostume(jogino.costume, new Date()));
+  let trailClock = 0;
 
   // The window size as state, so the shelf follows when it changes.
   let view = $state({ width: innerWidth, height: innerHeight });
@@ -70,6 +75,11 @@
       body = next.body;
       spun += Math.abs(body.angle - before);
       ({ vx, vy } = body);
+      trailClock += dt;
+      if (worn && !landOnShelf && trailClock > 0.12 && Math.hypot(vx, vy) > 300) {
+        trailClock = 0;
+        scatter(worn, body.x + W / 2, body.y + H / 2, 1);
+      }
       if (next.resting) land();
     } else if (mode === 'walking') {
       const target = home().x;
@@ -222,6 +232,7 @@
     grab = null;
     if (dragged) {
       const { vx, vy } = releaseVelocity(samples);
+      if (worn) scatter(worn, body.x + W / 2, body.y + H / 2, 12, Math.hypot(vx, vy));
       throwFrom(vx, vy);
     }
   }
@@ -317,7 +328,7 @@
 
 {#if open}
   <div class="jogino-bubble" bind:this={bubble} role="dialog" aria-label="Jogiño" style:right="{bubbleAt.right}px" style:bottom="{bubbleAt.bottom}px">
-    <strong>¡Hola, soy Jogiño!</strong>
+    <strong>{greetingFor(new Date())}</strong>
     <p>{text}</p>
     {#if action.href}
       <a class="btn jogino-action" href={action.href}>{action.label}</a>
@@ -360,6 +371,8 @@
     filter: drop-shadow(0 6px 8px #10201833);
   }
   .jogino-buddy.held { cursor: grabbing; }
+  :global(.jogino-spark) { position: fixed; z-index: 32; top: -7px; left: -7px; pointer-events: none; }
+  :global(.jogino-spark svg) { display: block; overflow: visible; }
   .jogino-shelf {
     position: fixed;
     z-index: 29;
