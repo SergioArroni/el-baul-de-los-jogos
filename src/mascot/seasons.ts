@@ -1,7 +1,7 @@
 // Jogiño dresses up for the time of year: a costume on his own, or the one the person picks.
 // Dates are Spain's: Reyes on 6 January, Carnaval moving with Easter.
 
-export const COSTUMES = ['halloween', 'navidad', 'finDeAno', 'reyes', 'sanValentin', 'carnaval', 'primavera', 'verano', 'otono'] as const;
+export const COSTUMES = ['halloween', 'navidad', 'finDeAno', 'reyes', 'sanValentin', 'carnaval', 'primavera', 'cumple', 'verano', 'otono'] as const;
 export type Costume = (typeof COSTUMES)[number];
 /** What's saved: follow the calendar, never dress up, or always wear one costume. */
 export type CostumeChoice = 'auto' | 'ninguno' | Costume;
@@ -14,6 +14,7 @@ export const COSTUME_INFO: Record<Costume, { label: string; greeting: string }> 
   sanValentin: { label: 'San Valentín', greeting: '¡Feliz San Valentín! ¿Un juego para dos?' },
   carnaval: { label: 'Carnaval', greeting: '¡Feliz Carnaval! ¿A que no me reconoces?' },
   primavera: { label: 'Primavera', greeting: '¡Hola, soy Jogiño! Ya es primavera.' },
+  cumple: { label: 'Su cumpleaños', greeting: '¡Hoy es mi cumpleaños! ¿Lo celebramos con una partida?' },
   verano: { label: 'Verano', greeting: '¡Hola, soy Jogiño! ¿Una partida a la sombra?' },
   otono: { label: 'Otoño', greeting: '¡Hola, soy Jogiño! Tarde de otoño, tarde de juegos.' },
 };
@@ -54,6 +55,7 @@ export function seasonFor(date: Date): Costume | null {
   if (md === 214) return 'sanValentin';
   if (today >= carnivalTuesday - 5 && today <= carnivalTuesday + 1) return 'carnaval';
   if (md >= 210 && md <= 214) return 'sanValentin';
+  if (md === 531) return 'cumple'; // Jogiño's birthday
   if (md >= 621 && md <= 915) return 'verano';
   if (md >= 321 && md <= 620) return 'primavera';
   if (md >= 916 && md <= 1130) return 'otono';

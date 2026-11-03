@@ -85,6 +85,19 @@
     <ellipse cx="62" cy="0" rx="3.4" ry="5" fill="#f4a3c0" transform="rotate({turn} 62 5)" />
   {/each}
   <circle cx="62" cy="5" r="2.8" fill="#f4c542" />
+{:else if costume === 'cumple'}
+  <!-- His birthday (31 May): a party hat and a cake with a candle. -->
+  <g transform="rotate(-14 46 6)">
+    <path d="M37 8L46-15L55 8Z" fill="#e2557a" />
+    <circle cx="44" cy="-4" r="1.3" fill="#fffaf2" /><circle cx="48.5" cy="1.5" r="1.3" fill="#fffaf2" /><circle cx="41.5" cy="4.5" r="1.3" fill="#fffaf2" /><circle cx="46.5" cy="-9" r="1.1" fill="#fffaf2" />
+    <circle cx="46" cy="-16" r="2.8" fill="#f4c542" />
+  </g>
+  <g transform="translate(9 52)">
+    <rect x="-10" y="-2" width="20" height="10" rx="2" fill="#f3d9b1" stroke="#d9b98a" stroke-width=".8" />
+    <path d="M-10 0Q-10-4-6-4H6Q10-4 10 0Q8 3 6 0Q4 3 2 0Q0 3-2 0Q-4 3-6 0Q-8 3-10 0Z" fill="#f4a3c0" />
+    <rect x="-1" y="-11" width="2" height="7" rx=".8" fill="#5b8ede" />
+    <path d="M0-15.5Q2.2-12.5 0-11Q-2.2-12.5 0-15.5Z" fill="#f4c542" />
+  </g>
 {:else if costume === 'verano'}
   <!-- Sunglasses pushed up on his head and a swim ring round his waist. -->
   <g transform="rotate(-8 50 6)">

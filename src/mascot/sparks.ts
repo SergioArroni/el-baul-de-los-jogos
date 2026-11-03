@@ -14,6 +14,7 @@ const SHAPES: Record<Costume, (colour: string) => string> = {
   reyes: () => '<path d="M0-5Q.8-.8 5 0Q.8.8 0 5Q-.8.8-5 0Q-.8-.8 0-5Z" fill="#e8b830"/>',
   sanValentin: () => HEART,
   carnaval: colour => `<rect x="-1.5" y="-3" width="3" height="6" rx="1" fill="${colour}"/>`,
+  cumple: colour => `<rect x="-1.5" y="-3" width="3" height="6" rx="1" fill="${colour}"/>`,
   primavera: () => '<ellipse rx="2.4" ry="4" fill="#f4a3c0"/>',
   verano: () => '<path d="M0-4.5Q3.5 0 3.5 2A3.5 3.5 0 0 1-3.5 2Q-3.5 0 0-4.5Z" fill="#5b9ede"/>',
   otono: colour => `<path d="M-4 4Q-4-4 4-4Q4 4-4 4Z" fill="${colour}"/>`,

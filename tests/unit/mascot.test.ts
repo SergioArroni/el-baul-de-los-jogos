@@ -83,6 +83,7 @@ describe('Jogiño dresses up for the time of year', () => {
     expect(on('2026-02-14')).toBe('sanValentin');
     expect(on('2026-04-10')).toBe('primavera');
     expect(on('2026-08-01')).toBe('verano');
+    expect([on('2027-05-30'), on('2027-05-31'), on('2027-06-01')]).toEqual(['primavera', 'cumple', 'primavera']);
     expect(on('2026-09-20')).toBe('otono');
   });
 
