@@ -10,7 +10,7 @@ Al terminarla, se borra de aquí.
 - **Activar Google** en Google Cloud y Supabase (`docs/GOOGLE-LOGIN.md`), incluida la URL de la APK.
 - **Reglas de 7 juegos** sin explicación fiable: Game Off, ¿Alguien ha probado este juego?,
   La Vacuna Española, El Cubilete, el juego de beber, Codex y Brink.
-- **Ejecutar `sql/play-expansions.sql`** en Supabase (con qué expansiones se jugó cada partida).
+- **Correos con Gmail en Supabase** (`docs/CORREO.md`): el servidor de pruebas de Supabase solo envía 2 correos por hora.
 - **Catálogo BGG**: programado; falta registrar la app en BGG, el token y `sql/catalog.sql` (`docs/BGG.md`).
 
 ## Publicar en Google Play (acordado el 2026-10-25; sin monetizar de momento)

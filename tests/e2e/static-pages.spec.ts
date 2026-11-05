@@ -57,3 +57,16 @@ test('the privacy policy is there, with the contact address of the app', async (
   await expect(page.getByRole('link', { name: 'elbauldelosjogos@gmail.com' }).first()).toHaveAttribute('href', 'mailto:elbauldelosjogos@gmail.com');
   await expect(page.getByText('pendiente de publicar')).toHaveCount(0);
 });
+
+test('signing up when Supabase has sent too many emails explains it in Spanish', async ({ page }) => {
+  await page.route('**/auth/v1/signup**', route => route.fulfill({
+    status: 429,
+    json: { code: 429, error_code: 'over_email_send_rate_limit', msg: 'email rate limit exceeded' },
+  }));
+  await page.goto('/login.html?signup=1');
+  await page.getByLabel('Correo electrónico').fill('nueva@example.com');
+  await page.getByLabel('Apodo').fill('nueva_jugadora');
+  await page.getByLabel('Contraseña').fill('una-contraseña-larga');
+  await page.getByRole('button', { name: 'Crear mi cuenta' }).click();
+  await expect(page.locator('#message')).toHaveText(/hemos llegado al límite de envíos por hora/);
+});
