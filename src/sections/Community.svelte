@@ -16,6 +16,7 @@
   let friendDialog = $state<{ open: boolean; friend?: Friend; inviteOnly?: boolean }>({ open: false });
   let groupDialog = $state<{ open: boolean; group?: Group }>({ open: false });
   let sharing = $state<Group | null>(null);
+  let requestStatus = $state('');
 
   let query = $state('');
   let results = $state<PersonSummary[]>([]);
@@ -46,17 +47,21 @@
 
   const groupCount = (friend: Friend) => app.groups.filter(g => (g.friendIds ?? []).includes(friend.id)).length;
 
-  function accept(ownerId: string) {
+  async function accept(ownerId: string) {
+    if (!app.people.has(ownerId)) await app.loadPeople([ownerId]);
     const nickname = app.people.get(ownerId)?.nickname;
     if (nickname) app.addFriendAccount(ownerId, nickname);
+    else requestStatus = 'No se ha podido cargar su perfil. Revisa la conexión y vuelve a intentarlo.';
   }
 
   async function dismiss(ownerId: string) {
+    requestStatus = '';
     try {
       await dismissFriendRequest(ownerId, app.user!.id);
       app.friendRequests = app.friendRequests.filter(r => r.owner_id !== ownerId);
     } catch (error) {
       console.error(error);
+      requestStatus = 'No se ha podido ignorar el aviso: ' + (error as Error).message;
     }
   }
 
@@ -75,6 +80,7 @@
   <div class="sectionhead"><div><h2>Amigos y grupos</h2><p>Organiza tus amigos y crea grupos combinándolos como quieras.</p></div></div>
 
   <div aria-live="polite">
+    {#if requestStatus}<p class="notice">{requestStatus}</p>{/if}
     {#each app.pendingRequests as request (request.owner_id)}
       {@const nickname = app.people.get(request.owner_id)?.nickname ?? 'Alguien'}
       <article class="request-card">

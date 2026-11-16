@@ -17,6 +17,7 @@
   function submit(event: SubmitEvent) {
     event.preventDefault();
     const trimmed = name.trim();
+    if (!trimmed) return void (status = 'Escribe el nombre del lugar.');
     if (app.places.some(place => nameKey(place.name) === nameKey(trimmed))) {
       status = 'Ya existe un lugar con ese nombre.';
       return;

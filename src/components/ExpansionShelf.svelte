@@ -2,6 +2,7 @@
   import { coverUrl, findInLibrary } from '../content/library';
   import { proposeGame } from '../data/wishlist';
   import { addExpansion, coverOf, expansionsOf, toggleExpansion, type ExpansionView } from '../domain/expansions';
+  import { nameKey } from '../domain/text';
   import type { Game } from '../domain/types';
   import { gsap, prefersReducedMotion } from '../motion';
   import { tap } from '../platform/native';
@@ -38,11 +39,13 @@
   }
 
   async function propose(view: ExpansionView) {
-    if (!app.user) return;
+    if (!app.user || proposing) return;
+    const title = `${game.name}: ${view.name}`;
+    if (app.wishlist.some(wish => nameKey(wish.title) === nameKey(title))) return void (status = `«${view.name}» ya estaba en Por comprar.`);
     proposing = view.name;
     try {
       await proposeGame({
-        user_id: app.user.id, title: `${game.name}: ${view.name}`, url: '', description: `Expansión de ${game.name}.`,
+        user_id: app.user.id, title, url: '', description: `Expansión de ${game.name}.`,
         price: null, publisher: null, players: game.players || null, duration: game.duration ? String(game.duration) : null, notes: null,
       });
       await app.reloadWishlist();
@@ -81,7 +84,7 @@
             </button>
             <span class="expansion-name">{view.name}</span>
             {#if !view.owned && !readonly && app.user}
-              <button type="button" class="linkbutton expansion-propose" disabled={proposing === view.name} onclick={() => propose(view)}>
+              <button type="button" class="linkbutton expansion-propose" disabled={!!proposing} onclick={() => propose(view)}>
                 <Icon name="cart" /> Proponer
               </button>
             {/if}

@@ -15,6 +15,9 @@
   let status = $state('');
   let open = $state(false);
   let formStatus = $state('');
+  let sending = $state(false);
+  /** The proposal whose meeple is on its way to the server, so a second tap waits. */
+  let placing = $state('');
   const empty = { title: '', url: '', hype: '' as WishlistHype | '', price: '', publisher: '', players: '', duration: '', description: '', notes: '' };
   let form = $state({ ...empty });
 
@@ -29,10 +32,13 @@
   /** The proposal that just got your meeple, so only that one drops in. */
   let justPlaced = $state('');
 
-  function toggleMeeple(game: WishlistGame, placed: boolean) {
+  async function toggleMeeple(game: WishlistGame, placed: boolean) {
+    if (placing) return;
+    placing = game.id;
     tap();
     justPlaced = placed ? '' : game.id;
-    void run(() => setMeeple(game.id, app.user!.id, !placed));
+    await run(() => setMeeple(game.id, app.user!.id, !placed));
+    placing = '';
   }
 
   async function run(action: () => Promise<void>) {
@@ -57,6 +63,9 @@
     const url = safeHttpUrl(form.url.trim());
     if (form.url.trim() && !url) return void (formStatus = 'Introduce un enlace http o https válido, o déjalo vacío.');
     if (!form.hype) return void (formStatus = 'Elige tus ganas de jogo.');
+    if (!form.title.trim() || !form.description.trim()) return void (formStatus = 'Escribe el nombre del juego y una descripción.');
+    if (sending) return;
+    sending = true;
     formStatus = 'Guardando propuesta…';
     try {
       await proposeGame({
@@ -68,6 +77,8 @@
       await app.reloadWishlist();
     } catch (error) {
       formStatus = (error as Error).message;
+    } finally {
+      sending = false;
     }
   }
 
@@ -108,7 +119,7 @@
           {#if game.notes}<p class="details">{game.notes}</p>{/if}
           <div class="cardfoot">
             {#if url}<a class="btn secondary" href={url} target="_blank" rel="noopener noreferrer">Ver ficha / tienda</a>{/if}
-            <button class="btn {voted ? 'secondary' : 'ghost'}" disabled={!voted && !left} onclick={() => toggleMeeple(game, voted)}>{voted ? 'Quitar mi meeple' : left ? 'Poner mi meeple' : 'Sin meeples libres'}</button>
+            <button class="btn {voted ? 'secondary' : 'ghost'}" disabled={(!voted && !left) || placing === game.id} onclick={() => toggleMeeple(game, voted)}>{voted ? 'Quitar mi meeple' : left ? 'Poner mi meeple' : 'Sin meeples libres'}</button>
             {#if game.user_id === app.user.id}<button class="btn ghost" onclick={() => remove(game)}>Quitar</button>{/if}
           </div>
         </article>
@@ -134,6 +145,6 @@
       <div class="field full"><label for="wishNotes">Otros datos</label><textarea id="wishNotes" maxlength="500" placeholder="Edición, expansiones, idioma u otros detalles" bind:value={form.notes}></textarea></div>
     </div>
     <p class="message" role="status">{formStatus}</p>
-    <div class="formactions"><button type="button" class="btn ghost" onclick={() => (open = false)}>Cancelar</button><button class="btn" type="submit">Añadir a la lista</button></div>
+    <div class="formactions"><button type="button" class="btn ghost" onclick={() => (open = false)}>Cancelar</button><button class="btn" type="submit" disabled={sending}>Añadir a la lista</button></div>
   </form>
 </Modal>

@@ -68,6 +68,7 @@
       // Its expansions are edited from the game's sheet: keep them.
       ...(game?.expansions ? { expansions: game.expansions } : {}),
     };
+    if (!saved.name) return void (status = 'Escribe el nombre del juego.');
     if (app.games.some(g => g.id !== saved.id && nameKey(g.name) === nameKey(saved.name))) {
       status = 'Ya hay un juego con ese nombre en tu colección.';
       return;

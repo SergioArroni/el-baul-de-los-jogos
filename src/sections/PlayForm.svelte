@@ -107,6 +107,8 @@
 
   async function submit(event: SubmitEvent) {
     event.preventDefault();
+    if (saving) return;
+    if (!form.game.trim()) return void (status = 'Escribe a qué juego jugasteis.');
     if (!players.length) {
       status = 'Marca al menos un jugador.';
       return;
@@ -139,17 +141,21 @@
   }
 
   async function remove() {
-    if (!play) return;
+    if (!play || saving) return;
     if (!confirmDelete) {
       confirmDelete = true;
       return;
     }
+    saving = true;
+    status = 'Eliminando…';
     try {
       await deletePlay(play.id);
       await app.reloadPlays();
       onclose();
     } catch (error) {
       status = 'No se pudo eliminar: ' + (error as Error).message;
+    } finally {
+      saving = false;
     }
   }
 </script>
@@ -225,7 +231,7 @@
     </div>
     <p class="notice" role="status">{status}</p>
     <div class="formactions">
-      {#if play}<button type="button" class="btn ghost" onclick={remove}>{confirmDelete ? '¿Seguro? Pulsa otra vez' : 'Eliminar'}</button>{/if}
+      {#if play}<button type="button" class="btn ghost" disabled={saving} onclick={remove}>{confirmDelete ? '¿Seguro? Pulsa otra vez' : 'Eliminar'}</button>{/if}
       <button type="button" class="btn ghost" onclick={onclose}>Cancelar</button>
       <button class="btn" type="submit" disabled={saving}>Guardar partida</button>
     </div>

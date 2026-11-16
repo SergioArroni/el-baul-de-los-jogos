@@ -1,23 +1,29 @@
 <script lang="ts">
   import { untrack } from 'svelte';
   import Modal from '../components/Modal.svelte';
+  import { nameKey } from '../domain/text';
   import type { Group } from '../domain/types';
   import { app, uid } from '../stores/app.svelte';
 
   let { open, group, onclose }: { open: boolean; group?: Group; onclose: () => void } = $props();
 
   let form = $state({ name: '', size: '', friendIds: [] as string[], likes: '', notes: '' });
+  let status = $state('');
 
   $effect(() => {
     if (open) untrack(() => {
+      status = '';
       form = { name: group?.name ?? '', size: String(group?.size ?? ''), friendIds: [...(group?.friendIds ?? [])], likes: group?.likes ?? '', notes: group?.notes ?? '' };
     });
   });
 
   function submit(event: SubmitEvent) {
     event.preventDefault();
+    const name = form.name.trim();
+    if (!name) return void (status = 'Escribe el nombre del grupo.');
+    if (app.groups.some(g => !g._shared && g.id !== group?.id && nameKey(g.name) === nameKey(name))) return void (status = 'Ya tienes un grupo con ese nombre.');
     app.upsertGroup({
-      id: group?.id ?? uid(), name: form.name.trim(), size: Number(form.size) || null, friendIds: form.friendIds,
+      id: group?.id ?? uid(), name, size: Number(form.size) || null, friendIds: form.friendIds,
       likes: form.likes.trim(), notes: form.notes.trim(),
     });
     onclose();
@@ -43,6 +49,7 @@
       <div class="field full"><label for="groupLikes">Qué les gusta</label><input id="groupLikes" placeholder="Fiesta, estrategia, cooperativos…" bind:value={form.likes} /></div>
       <div class="field full"><label for="groupNotes">Experiencia, límites y notas</label><textarea id="groupNotes" placeholder="Ej. principiantes, les gusta el pique, no quieren reglas largas…" bind:value={form.notes}></textarea></div>
     </div>
+    <p class="notice" role="status">{status}</p>
     <div class="formactions"><button type="button" class="btn ghost" onclick={onclose}>Cancelar</button><button class="btn" type="submit">Guardar grupo</button></div>
   </form>
 </Modal>
