@@ -58,7 +58,7 @@
 
 <section class="panel active">
   <div class="sectionhead"><div><h2>¿Qué jugamos?</h2><p>Indica cuántos sois y qué os apetece; te sugeriré juegos de tu colección.</p></div></div>
-  <RandomGame onopen={game => onedit(game.id)} />
+  <RandomGame onopen={game => (detail = game)} />
   <div class="card" style="margin-top:15px">
     <div class="formgrid">
       <div class="field"><label for="recPlayers">¿Cuántas personas?</label><input id="recPlayers" type="number" min="1" max="30" bind:value={players} /></div>

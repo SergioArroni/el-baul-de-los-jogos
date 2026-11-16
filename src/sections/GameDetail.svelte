@@ -88,9 +88,9 @@
     </div>
     {#if !readonly}
       <div class="formactions">
-        <button type="button" class="btn ghost" onclick={() => ondelete?.(game)}>Eliminar</button>
-        <button type="button" class="btn secondary" onclick={() => onedit?.(game)}>Editar</button>
-        {#if canPlay}<button type="button" class="btn" onclick={() => onplay?.(game)}>Registrar partida</button>{/if}
+        {#if ondelete}<button type="button" class="btn ghost" onclick={() => ondelete(game)}>Eliminar</button>{/if}
+        {#if onedit}<button type="button" class="btn secondary" onclick={() => onedit(game)}>Editar</button>{/if}
+        {#if canPlay && onplay}<button type="button" class="btn" onclick={() => onplay(game)}>Registrar partida</button>{/if}
       </div>
     {/if}
   {/if}
