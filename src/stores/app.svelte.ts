@@ -18,6 +18,8 @@ import type {
 
 /** Shown when the app opens without connection: the last synced copy is on screen, edits stay on this device. */
 const OFFLINE = 'Sin conexión · los cambios no se guardarán';
+/** A save failed for lack of connection: it's kept on this device and sent when the connection is back. */
+const SAVE_PENDING = 'Sin conexión · se guardará al volver';
 
 export type Tab = 'catalog' | 'recommend' | 'plays' | 'ranking' | 'groups' | 'newGames' | 'places' | 'profile' | 'backup';
 
@@ -59,6 +61,7 @@ class AppStore {
 
   private cloud: CloudSync | null = null;
   private queue: Promise<void> = Promise.resolve();
+  private retryPending = false;
 
   get collection(): Collection {
     return $state.snapshot({ games: this.games, groups: this.groups, friends: this.friends, places: this.places });
@@ -150,8 +153,15 @@ class AppStore {
         this.syncStatus = 'Sincronizado';
       })
       .catch(error => {
-        this.syncStatus = 'Error al sincronizar';
         console.error(error);
+        if (navigator.onLine) return void (this.syncStatus = 'Error al sincronizar');
+        this.syncStatus = SAVE_PENDING;
+        if (this.retryPending) return;
+        this.retryPending = true;
+        window.addEventListener('online', () => {
+          this.retryPending = false;
+          this.save();
+        }, { once: true });
       });
   }
 

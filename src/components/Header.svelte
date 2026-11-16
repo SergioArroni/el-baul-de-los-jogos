@@ -32,9 +32,9 @@
 />
 
 <header class="app-header">
-  <a class="brand" href="index.html" aria-label="El Baul de los Jogos, inicio">
+  <a class="brand" href="index.html" aria-label="El Baúl de los Jogos, inicio">
     <span class="brand-mark" aria-hidden="true"><span class="logo-shape"></span></span>
-    <span><span class="brand-name">El Baul de los Jogos</span><span class="brand-caption">Tu colección, en orden</span></span>
+    <span><span class="brand-name">El Baúl de los Jogos</span><span class="brand-caption">Tu colección, en orden</span></span>
   </a>
   <div class="header-actions">
     <span class="syncstatus" aria-live="polite">{app.syncStatus}</span>

@@ -226,3 +226,45 @@ test('typing an expansion of a game you have offers to put it inside', async ({ 
   await covers(page).filter({ hasText: 'Scythe' }).first().click();
   await expect(page.getByRole('dialog').getByRole('button', { name: 'Encuentros: la tienes' })).toBeVisible();
 });
+
+test('dialogs hold the keyboard, stop the page behind and give focus back', async ({ page }) => {
+  const add = page.getByRole('button', { name: 'Añadir juego' });
+  await add.click();
+  const form = page.getByRole('dialog', { name: 'Añadir juego' });
+  await expect(form).toBeFocused();
+  // The page behind doesn't scroll while a dialog is open.
+  expect(await page.evaluate(() => document.documentElement.style.overflow)).toBe('hidden');
+  // Shift+Tab from the top wraps to the last button instead of leaving the dialog.
+  await page.keyboard.press('Shift+Tab');
+  await expect(form.getByRole('button', { name: 'Guardar juego' })).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(form).toBeHidden();
+  await expect(add).toBeFocused();
+  expect(await page.evaluate(() => document.documentElement.style.overflow)).toBe('');
+});
+
+test('the random game opens its sheet, where it can be read but not deleted by mistake', async ({ page }) => {
+  await page.getByRole('button', { name: 'Qué jugamos' }).click();
+  await page.getByRole('button', { name: 'Tirar el dado' }).click();
+  await page.locator('.random-pick .cover').click();
+  const sheet = page.locator('.detail-dialog');
+  await expect(sheet).toBeVisible();
+  await expect(sheet.getByRole('button', { name: 'Editar' })).toBeVisible();
+  await expect(sheet.getByRole('button', { name: 'Eliminar' })).toHaveCount(0);
+});
+
+test('a group needs a real name, and only one with each name', async ({ page }) => {
+  await page.getByRole('button', { name: 'Comunidad' }).click();
+  await page.getByRole('button', { name: 'Añadir grupo' }).click();
+  const form = page.getByRole('dialog', { name: 'Añadir grupo' });
+  await form.getByLabel('Nombre del grupo *').fill('   ');
+  await form.getByRole('button', { name: 'Guardar grupo' }).click();
+  await expect(form.getByText('Escribe el nombre del grupo.')).toBeVisible();
+  await form.getByLabel('Nombre del grupo *').fill('Los viernes');
+  await form.getByRole('button', { name: 'Guardar grupo' }).click();
+  await expect(form).toBeHidden();
+  await page.getByRole('button', { name: 'Añadir grupo' }).click();
+  await form.getByLabel('Nombre del grupo *').fill('los viernes');
+  await form.getByRole('button', { name: 'Guardar grupo' }).click();
+  await expect(form.getByText('Ya tienes un grupo con ese nombre.')).toBeVisible();
+});

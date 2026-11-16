@@ -19,7 +19,7 @@
   import JoginoBuddy from './mascot/JoginoBuddy.svelte';
   import { jogino } from './mascot/prefs.svelte';
   import { handleBackButton, hideSplash } from './platform/native';
-  import { enter } from './motion';
+  import { enter, prefersReducedMotion } from './motion';
   import { app, type Tab } from './stores/app.svelte';
 
   // The play form opens from several screens (catalog sheet, plays, group cards), so it lives here.
@@ -52,14 +52,14 @@
   async function openConnect() {
     navigate('profile');
     await tick();
-    document.getElementById('conectar-ia')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.getElementById('conectar-ia')?.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'start' });
   }
 
   function navigate(tab: Tab) {
     if (tab === 'backup' && !app.isAdmin) return;
     app.tab = tab;
     app.personView = null;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
     if (tab === 'profile') app.loadProfile().catch(error => console.error(error));
   }
 </script>

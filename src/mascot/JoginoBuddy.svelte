@@ -243,6 +243,8 @@
       dragged = false;
       return;
     }
+    // Mid-air or on his way back the bubble would open wherever he happens to be.
+    if (mode !== 'home') return;
     bubbleAt = { right: Math.max(8, innerWidth - body.x - W), bottom: innerHeight - body.y + 6 };
     open = !open;
   }
@@ -251,6 +253,7 @@
     const start = home();
     const reduced = prefersReducedMotion();
     let entered = false;
+    let dropIn: ReturnType<typeof setTimeout> | undefined;
     try {
       entered = sessionStorage.getItem('el-baul-jogino-entered') === '1';
       sessionStorage.setItem('el-baul-jogino-entered', '1');
@@ -262,7 +265,7 @@
     } else {
       // First visit in this session: he drops into his corner from above.
       body = { ...body, x: start.x, y: -H, vx: 0, vy: 0 };
-      setTimeout(() => {
+      dropIn = setTimeout(() => {
         landOnShelf = true;
         throwFrom(0, 0);
       }, 900);
@@ -280,6 +283,7 @@
     };
     const resize = () => {
       view = { width: innerWidth, height: innerHeight };
+      open = false;
       if (mode === 'home') body = { ...body, ...home() };
     };
     const close = (event: Event) => {
@@ -292,6 +296,9 @@
     addEventListener('keydown', close);
     if (!reduced) wake();
     return () => {
+      clearTimeout(dropIn);
+      standUp?.kill();
+      ladderTween?.kill();
       gsap.ticker.remove(tick);
       removeEventListener('pointermove', followPointer);
       removeEventListener('resize', resize);
