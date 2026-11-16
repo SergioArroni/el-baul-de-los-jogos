@@ -71,7 +71,8 @@
     const previous = document.activeElement as HTMLElement | null;
     lockScroll(true);
     // Not the first field: on phones that would pop the keyboard up over the form.
-    if (!node.contains(document.activeElement)) node.focus({ preventScroll: true });
+    // A confirmation marks its main button with autofocus, so Enter answers it.
+    if (!node.contains(document.activeElement)) (node.querySelector<HTMLElement>('[autofocus]') ?? node).focus({ preventScroll: true });
     return {
       destroy() {
         lockScroll(false);

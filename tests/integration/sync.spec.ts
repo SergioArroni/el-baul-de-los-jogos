@@ -35,3 +35,17 @@ test('two devices editing at once keep each other’s changes', async ({ browser
   const notes = sql(`select data->>'notes' from public.games where user_id = '${users.c.id}' and data->>'name' = 'Munchkin';`).trim();
   expect(notes).toBe('Editado en el dispositivo 1');
 });
+
+test('a change made without connection is saved when the connection is back', async ({ browser }) => {
+  const page = await openAs(browser, 'c');
+  await page.context().setOffline(true);
+  await page.getByRole('button', { name: 'Gestionar lugares' }).click();
+  await page.getByRole('button', { name: 'Añadir lugar' }).click();
+  await page.getByLabel('Nombre del lugar *').fill('Casa sin wifi');
+  await page.getByRole('button', { name: 'Guardar lugar' }).click();
+  await expect(page.locator('.syncstatus')).toHaveText('Sin conexión · se guardará al volver');
+
+  await page.context().setOffline(false);
+  await waitSynced(page);
+  await expect.poll(() => sql(`select count(*) from public.places where user_id = '${users.c.id}' and data->>'name' = 'Casa sin wifi'`, { admin: true }).trim()).toBe('1');
+});

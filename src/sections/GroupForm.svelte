@@ -21,7 +21,9 @@
     event.preventDefault();
     const name = form.name.trim();
     if (!name) return void (status = 'Escribe el nombre del grupo.');
-    if (app.groups.some(g => !g._shared && g.id !== group?.id && nameKey(g.name) === nameKey(name))) return void (status = 'Ya tienes un grupo con ese nombre.');
+    // Only when the name is new or changed: groups that already shared a name can still be edited.
+    const renamed = nameKey(name) !== nameKey(group?.name ?? '');
+    if (renamed && app.groups.some(g => !g._shared && g.id !== group?.id && nameKey(g.name) === nameKey(name))) return void (status = 'Ya tienes un grupo con ese nombre.');
     app.upsertGroup({
       id: group?.id ?? uid(), name, size: Number(form.size) || null, friendIds: form.friendIds,
       likes: form.likes.trim(), notes: form.notes.trim(),

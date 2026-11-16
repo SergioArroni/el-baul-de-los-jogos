@@ -119,7 +119,7 @@
           {#if game.notes}<p class="details">{game.notes}</p>{/if}
           <div class="cardfoot">
             {#if url}<a class="btn secondary" href={url} target="_blank" rel="noopener noreferrer">Ver ficha / tienda</a>{/if}
-            <button class="btn {voted ? 'secondary' : 'ghost'}" disabled={(!voted && !left) || placing === game.id} onclick={() => toggleMeeple(game, voted)}>{voted ? 'Quitar mi meeple' : left ? 'Poner mi meeple' : 'Sin meeples libres'}</button>
+            <button class="btn {voted ? 'secondary' : 'ghost'}" disabled={(!voted && !left) || !!placing} onclick={() => toggleMeeple(game, voted)}>{voted ? 'Quitar mi meeple' : left ? 'Poner mi meeple' : 'Sin meeples libres'}</button>
             {#if game.user_id === app.user.id}<button class="btn ghost" onclick={() => remove(game)}>Quitar</button>{/if}
           </div>
         </article>

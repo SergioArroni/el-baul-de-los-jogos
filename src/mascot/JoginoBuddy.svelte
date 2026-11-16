@@ -282,8 +282,9 @@
       if (calm) wake();
     };
     const resize = () => {
+      // Only when the width changes: on phones the address bar hiding also fires a resize.
+      if (innerWidth !== view.width) open = false;
       view = { width: innerWidth, height: innerHeight };
-      open = false;
       if (mode === 'home') body = { ...body, ...home() };
     };
     const close = (event: Event) => {
