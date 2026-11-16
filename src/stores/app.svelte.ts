@@ -293,6 +293,16 @@ class AppStore {
     this.save();
   }
 
+  /** Removes a place and takes it off the games that were there (the games stay). */
+  deletePlace(id: string): void {
+    const place = this.places.find(p => p.id === id);
+    if (!place) return;
+    this.places = this.places.filter(p => p.id !== id);
+    this.games = this.games.map(game =>
+      game.locations.includes(place.name) ? { ...game, locations: game.locations.filter(name => name !== place.name) } : game);
+    this.save();
+  }
+
   replaceCollection(collection: Collection): void {
     this.useCollection(collection);
     this.save();

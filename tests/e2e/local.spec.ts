@@ -79,7 +79,21 @@ test('places can be added once', async ({ page }) => {
   await expect(page.getByText('Ya existe un lugar con ese nombre.')).toBeVisible();
   await page.getByLabel('Nombre del lugar *').fill('Bar Tablero');
   await page.getByRole('button', { name: 'Guardar lugar' }).click();
-  await expect(page.getByRole('cell', { name: 'Bar Tablero' })).toBeVisible();
+  await expect(page.getByRole('cell', { name: 'Bar Tablero', exact: true })).toBeVisible();
+});
+
+test('a place can be deleted: its games stay, and it does not come back', async ({ page }) => {
+  await page.getByRole('button', { name: 'Gestionar lugares' }).click();
+  await page.getByRole('button', { name: 'Eliminar Casa Sergio' }).click();
+  const confirm = page.locator('.confirm-dialog');
+  await expect(confirm).toContainText('no se borran');
+  await confirm.getByRole('button', { name: 'Eliminar' }).click();
+  await expect(page.getByRole('cell', { name: 'Casa Sergio', exact: true })).toHaveCount(0);
+  await page.reload();
+  await expect(covers(page)).toHaveCount(42);
+  await page.getByRole('button', { name: 'Gestionar lugares' }).click();
+  await expect(page.getByRole('cell', { name: 'Casa Enzo', exact: true })).toBeVisible();
+  await expect(page.getByRole('cell', { name: 'Casa Sergio', exact: true })).toHaveCount(0);
 });
 
 test('recommendations fit the number of players and the plan', async ({ page }) => {

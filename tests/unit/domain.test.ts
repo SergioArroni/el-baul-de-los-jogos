@@ -194,9 +194,10 @@ describe('seed', () => {
     expect(needsPlaceMigration(current, normalizeGamePlace(current))).toBe(false);
   });
 
-  it('keeps default places without duplicates', () => {
+  it('gives new collections the starting places, and leaves existing ones alone', () => {
     expect(seedGames()).toHaveLength(42);
-    expect(withDefaultPlaces([{ id: 'x', name: 'casa lu' }]).map(p => p.name)).toHaveLength(5);
+    // Once there are places, deleted defaults don't come back.
+    expect(withDefaultPlaces([{ id: 'x', name: 'casa lu' }]).map(p => p.name)).toEqual(['casa lu']);
     expect(withDefaultPlaces([])).toHaveLength(5);
   });
 });

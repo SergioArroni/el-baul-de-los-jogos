@@ -76,10 +76,9 @@ export const seedGames = (): Game[] =>
   INITIAL_GAMES.map(([name, players, types, weight, duration, location, notes], index) =>
     normalizeGamePlace({ id: 'seed' + index, name, players, types: types.split(','), weight, duration, location, notes }));
 
-/** Makes sure the default places exist, without duplicating ones the user already has. */
-export function withDefaultPlaces(places: Place[]): Place[] {
-  const result = places.length ? [...places] : INITIAL_PLACES.map(place => ({ ...place }));
-  for (const place of INITIAL_PLACES)
-    if (!result.some(p => p.name.toLocaleLowerCase() === place.name.toLocaleLowerCase())) result.push({ ...place });
-  return result;
-}
+/**
+ * The starting places for a collection that has none yet. Once there are places they are
+ * left alone: a default one that was deleted must not come back.
+ */
+export const withDefaultPlaces = (places: Place[]): Place[] =>
+  places.length ? [...places] : INITIAL_PLACES.map(place => ({ ...place }));
